@@ -22,6 +22,9 @@ var Graph = (function() {
 		colorList			: ["#00F","#0F0","#F00","#0FF","#F0F","#FF0"],
 		colorIndex			: 0,
 		
+		drawYAxis			: 3, // 0: none, 1: left, 2: right, 3: both
+		drawXAxis			: 3, // 0: none, 1: bottom, 2: top, 3: both
+		
 		yAxisLeftMargin 	: 0.101010101, // 10.1 % width (30 mm from left)
 		yAxisRightMargin	: 0.05050505051, // 5.05 % width (15 mm from right)
 		yAxisLineWidth 		: 1,
@@ -301,21 +304,74 @@ var Graph = (function() {
 
 		},
 
+		histogram : function(y, x) {
+			// x is an array: plot x.length bars, each centered in x[i]
+			
+			// x is a number: create x bars
+		},
+		
+		pie : function(y) {
+			
+		},
+		
 		drawYAxis : function() {
 
 			this.context.save();
 
-			/* Default left margin for y axis */
-			this.context.beginPath();
-			this.context.moveTo(
-				Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width)-0.5,
-				Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height));
-			this.context.lineTo(
-				Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width)-0.5,
-				Math.floor(GRAPH.xAxisTopMargin*this.canvas.height));
-			
-			this.context.lineWidth = GRAPH.yAxisLineWidth;
-			this.context.stroke();
+			switch (GRAPH.drawYAxis) {
+				default:
+				case 1: // left y axis
+					this.context.beginPath();
+					this.context.moveTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width)+0.5,
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height));
+					this.context.lineTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width)+0.5,
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height));
+
+					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.stroke();
+					break;
+				case 2: // right y axis
+					this.context.beginPath();
+					this.context.moveTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-0.5,
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height));
+					this.context.lineTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-0.5,
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height));
+
+					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.stroke();
+					break;
+				case 3: 
+					// left y axis
+					this.context.beginPath();
+					this.context.moveTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width)+0.5,
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height));
+					this.context.lineTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width)+0.5,
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height));
+
+					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.stroke();
+					
+					// right y axis
+					this.context.beginPath();
+					this.context.moveTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-0.5,
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height));
+					this.context.lineTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-0.5,
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height));
+
+					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.stroke();
+					break;
+				
+				case 0: break;
+			}
 
 			this.context.restore();
 
@@ -327,19 +383,64 @@ var Graph = (function() {
 
 			this.context.save();
 
-			/* Default top margin for x axis */
-			this.context.beginPath();
+			switch (GRAPH.drawXAxis) {
+				default:
+				case 1:
+					// bottom x axis
+					this.context.beginPath();
 
-			this.context.moveTo(
-				Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
-				Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)+0.5);
-			this.context.lineTo(
-				Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width),
-				Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)+0.5);
-			
-			this.context.lineWidth = GRAPH.xAxisLineWidth;
-			this.context.stroke();
+					this.context.moveTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)+0.5);
+					this.context.lineTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width),
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)+0.5);
 
+					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.stroke();
+					break;
+				case 2:
+					// top x axis
+					this.context.beginPath();
+
+					this.context.moveTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height)-0.5);
+					this.context.lineTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width),
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height)-0.5);
+
+					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.stroke();
+					break;
+				case 3:
+					// bottom x axis
+					this.context.beginPath();
+
+					this.context.moveTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)+0.5);
+					this.context.lineTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width),
+						Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)+0.5);
+
+					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.stroke();
+					
+					// top x axis
+					this.context.beginPath();
+
+					this.context.moveTo(
+						Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height)-0.5);
+					this.context.lineTo(
+						Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width),
+						Math.floor((1-GRAPH.xAxisBottomMargin)*this.canvas.height)-0.5);
+
+					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.stroke();
+					break;
+			}
 			this.context.restore();
 
 			return this;
@@ -348,9 +449,13 @@ var Graph = (function() {
 
 		drawAxis : function() {
 
-			this.drawYAxis();
+			if (GRAPH.drawYAxis) {
+				this.drawYAxis();
+			}
 
-			this.drawXAxis();
+			if (GRAPH.drawXAxis) {
+				this.drawXAxis();	
+			}
 
 			return this;
 
