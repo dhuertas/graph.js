@@ -4,11 +4,7 @@
  */
 var Graph = (function() {
 
-	/*
-	 * Size of a DIN A4: 297 mm width, 210 mm height, ratio: sqrt(2)
-	 * All ratios have been obtained considering the canvas 
-	 * area of a DIN A4.
-	 */
+
 	var GRAPH = {
 		canvasWidth 		: 600,
 		canvasHeight 		: 600/Math.sqrt(2),
@@ -25,7 +21,7 @@ var Graph = (function() {
 		drawYAxis			: 3, // 0: none, 1: left, 2: right, 3: both
 		drawXAxis			: 3, // 0: none, 1: bottom, 2: top, 3: both
 		
-		yAxisLeftMargin 	: 0.101010101, // 10.1 % width (30 mm from left)
+		yAxisLeftMargin 	: 0.101010101, // 10.1 % width (30 mm from left) 
 		yAxisRightMargin	: 0.05050505051, // 5.05 % width (15 mm from right)
 		yAxisLineWidth 		: 1,
 		yAxisTextBaseline	: "middle",
@@ -441,6 +437,7 @@ var Graph = (function() {
 					this.context.stroke();
 					break;
 			}
+
 			this.context.restore();
 
 			return this;
@@ -608,6 +605,37 @@ var Graph = (function() {
 	return construct;
 
 })();
+
+/*
+
+/*
+ * Size of a DIN A4: 297 mm width, 210 mm height, ratio: sqrt(2)
+ * All default values (in %) have been calculated considering the size of a DIN A4.
+ *  ______________________________________________________________________________________
+ * |                  A                                                                   |              A
+ * |       ___________|______________________________________________________________     |              |
+ * |  yMax|           |                                                  A           |<-->|              |
+ * |      |           |                                                  |           |  yAxisRightMargin |
+ * |      |           |                                                  |           |    |   (%)        |
+ * |      |           | xAxisTopMargin (%)                               |           |    |              |
+ * |<---->|           |                                                  |           |    |              |
+ * | yAxisLeftMargin  |                                                  |           |    |              |
+ * |      |(%)        |                                                  |           |    |              |
+ * |      |           |                                                  |           |    |              |
+ * |      |           |                   GRAPHING AREA                  |           |    |        canvas height
+ * |      |           |                                                  |           |    |              |
+ * |      |           |                                                  |           |    |              |
+ * |      |           |                                                  |           |    |              |
+ * |      |           |                                                  |           |    |              |
+ * |      |           |                            xAxisBottomMargin (%) |           |    |              |
+ * |      |           |                                                  |           |    |              |
+ * |      |           |                                                  |           |    |              |
+ * |  yMax|___________V__________________________________________________|___________|    |              |
+ * |       xMin                                                          |       xMax     |              |
+ * |_____________________________________________________________________V________________|              V
+ *
+ * <------------------------------------ canvas width ------------------------------------>
+ */
 
 /* Rectangles */
 // context.fillRect(50 /* x */, 50 /* y */, 100 /* width */, 100 /* height */);
