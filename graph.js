@@ -24,10 +24,14 @@ var Graph = (function() {
 		drawGrid : true,
 		
 		lineWidth : 1,
+		
 		pointStroke : true,
 		pointFill : false,
 		pointRadius : 3,
 		pointColorIndex : 0,
+		
+		barWidth : 1, // % width
+		barPosition : "left", // options are left, center, right. default: left.
 		
 		yAxisLeftMargin : 0.101010101, // 10.1 % width (30 mm from left) 
 		yAxisRightMargin : 0.05050505051, // 5.05 % width (15 mm from right)
@@ -191,18 +195,6 @@ var Graph = (function() {
 				yRange.push(this.yMax);
 			}
 
-			this.drawAxis();
-
-			this.drawXAxisNumbers(this.xMin,this.xMax);
-
-			/* Disable redrawing again the axis numbers. The first plot will set the scale */
-			GRAPH.drawXAxisNumbers = false;
-
-			this.drawYAxisNumbers(this.yMin, this.yMax);
-
-			/* Disable redrawing again the axis numbers. The first plot will set the scale */
-			GRAPH.drawYAxisNumbers = false;
-
 			this.drawGrid();
 
 			this.context.save();
@@ -233,6 +225,11 @@ var Graph = (function() {
 			this.context.lineWidth = GRAPH.lineWidth;
 			this.context.stroke();
 			this.context.restore();
+
+			this.drawAxis();
+
+			this.drawXAxisNumbers(this.xMin, this.xMax);
+			this.drawYAxisNumbers(this.yMin, this.yMax);
 
 			this.numberOfGraphs++;
 
@@ -329,18 +326,6 @@ var Graph = (function() {
 				yRange.push(this.yMax);
 			}
 
-			this.drawAxis();
-
-			this.drawXAxisNumbers(this.xMin,this.xMax);
-
-			/* Disable redrawing again the axis numbers. The first plot will set the scale */
-			GRAPH.drawXAxisNumbers = false;
-
-			this.drawYAxisNumbers(this.yMin, this.yMax);
-
-			/* Disable redrawing again the axis numbers. The first plot will set the scale */
-			GRAPH.drawYAxisNumbers = false;
-
 			this.drawGrid();
 			GRAPH.drawGrid = false;
 
@@ -378,6 +363,11 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawAxis();
+
+			this.drawXAxisNumbers(this.xMin, this.xMax);
+			this.drawYAxisNumbers(this.yMin, this.yMax);
+
 			this.numberOfGraphs++;
 
 			return this;
@@ -397,13 +387,52 @@ var Graph = (function() {
 				yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height),
 				yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)-yStart;
 
+			this.xMax = Math.max.apply(Math, x);
+			this.xMin = Math.min.apply(Math, x);
+			this.yMax = Math.max.apply(Math, y);
+			this.yMin = Math.min.apply(Math, y);
+
+			this.drawYAxisNumbers(this.yMin, this.yMax);
+
+			this.drawLabels(x);
+
 			this.context.save();
 
+			this.context.translate(xStart, yStart);
+
 			for (var i = 0; i < y.length; i++) {
+				/* top left corner position */
+				px = i*xEnd/y.length;
+				py = yEnd*(1-y[i]/this.yMax);
+
+				switch (GRAPH.barPosition) {
+					case "center":
+						px += (1-GRAPH.barWidth)*xEnd/y.length/2;
+						break;
+					case "right":
+						px += (1-GRAPH.barWidth)*xEnd/y.length;
+						break;
+					case "left":
+					default:
+						px += 0;
+						break;
+					
+				}
+
+				/* width and height of the rectangle */
+				width = GRAPH.barWidth*xEnd/y.length;
+				height = yEnd*y[i]/this.yMax;
 				
+				this.context.beginPath();
+				this.context.rect(px, py, width, height);
+				
+				this.context.fillStyle = GRAPH.colorList[(GRAPH.colorIndex++%GRAPH.colorList.length)];
+				this.context.fill();
 			}
 
 			this.context.restore();
+
+			this.drawAxis();
 
 			return this;
 
@@ -715,6 +744,9 @@ var Graph = (function() {
 				this.context.restore();
 			}
 
+			/* Disable redrawing again the axis numbers. The first plot will set the scale */
+			GRAPH.drawXAxisNumbers = false;
+
 			return this;
 
 		},
@@ -750,8 +782,20 @@ var Graph = (function() {
 				this.context.restore();
 			}
 
+			/* Disable redrawing again the axis numbers. The first plot will set the scale */
+			GRAPH.drawYAxisNumbers = false;
+
 			return this;
 
+		},
+
+		/*
+		 * Draws the labels for a bar plot
+		 * @param {array} labels
+		 * @return {object} this
+		 */
+		drawLabels : function(labels) {
+			
 		},
 
 		/*
