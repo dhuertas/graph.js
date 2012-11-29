@@ -32,6 +32,7 @@ var Graph = (function() {
 		
 		barWidth : 1, // % width
 		barPosition : "left", // options are left, center, right. default: left.
+		barLabelRotate : 0, // clockwise angle in degrees, starting from horizontal position
 		
 		yAxisLeftMargin : 0.101010101, // 10.1 % width (30 mm from left) 
 		yAxisRightMargin : 0.05050505051, // 5.05 % width (15 mm from right)
@@ -57,11 +58,7 @@ var Graph = (function() {
 		xGridNumLines : 8,
 		xGridLineLength : 1,
 		xGridSpaceLength : 4,
-		xGridLineColor : "#999",
-		
-		/* Private options */
-		_overwriteMinMaxValues : true,
-		
+		xGridLineColor : "#999"
 	};
 
 	/* helper functions */
@@ -379,21 +376,42 @@ var Graph = (function() {
 		 * @param {array} y (values)
 		 * @param {array} (bar labels)
 		 */
-		bars : function(y, x) {
+		bars : function(y, x, yRange) {
 
 			/* Calculate the graphing area */
 			var xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
 				xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-xStart,
 				yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height),
 				yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)-yStart;
+				
+			if (this.numberOfGraphs == 0) {
+				/* Max and Min values for each axis */
+				this.xMax = Math.max.apply(Math, x);
+				this.xMin = Math.min.apply(Math, x);
+				this.yMax = Math.max.apply(Math, y);
+				this.yMin = Math.min.apply(Math, y);
 
-			this.xMax = Math.max.apply(Math, x);
-			this.xMin = Math.min.apply(Math, x);
-			this.yMax = Math.max.apply(Math, y);
-			this.yMin = Math.min.apply(Math, y);
+				if (yRange instanceof Array) {
+					this.yMin = yRange[0];
+					this.yMax = yRange[1];
+				}
+			} else {
+				if (yRange instanceof Array) {
+					yRange[0] = yRange[0] < this.yMin ? this.yMin : yRange[0];
+					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
+				}
+			}
+
+			if ( ! (yRange instanceof Array)) {
+				yRange = [];
+				yRange.push(this.yMin);
+				yRange.push(this.yMax);
+			}
 
 			this.drawYAxisNumbers(this.yMin, this.yMax);
 
+			this.drawYGrid();
+			
 			this.drawLabels(x);
 
 			this.context.save();
@@ -433,6 +451,8 @@ var Graph = (function() {
 			this.context.restore();
 
 			this.drawAxis();
+
+			this.numberOfGraphs++;
 
 			return this;
 
@@ -629,6 +649,110 @@ var Graph = (function() {
 
 		},
 
+		drawYGrid : function() {
+			
+			if (GRAPH.drawGrid) {
+				/* Calculate the graphing area */
+				var xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+					xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-xStart,
+					yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height),
+					yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)-yStart;
+
+				var drawed = 0,
+					yPos = 0,
+					xPos = 0,
+					k = 0;
+
+				this.context.save();
+
+				this.context.translate(xStart, yStart);
+
+				this.context.beginPath();
+				
+				for (var i = 1; i <= GRAPH.yGridNumLines-1; i++) {
+
+					yPos = Math.floor(i*yEnd/GRAPH.yGridNumLines);
+					drawed = 0;
+					this.context.moveTo(xStart, yPos);
+					k = 0;
+
+					while (drawed < xEnd) {
+						/* Move from left to right */
+						switch (k%2) {
+							case 0:
+								drawed = (xEnd-drawed < GRAPH.xGridSpaceLength) ? xEnd : drawed+GRAPH.xGridSpaceLength;
+								this.context.moveTo(xEnd-drawed, yPos+0.5);
+								break;
+							case 1:
+								drawed = (xEnd-drawed < GRAPH.xGridLineLength) ? xEnd : drawed+GRAPH.xGridLineLength;
+								this.context.lineTo(xEnd-drawed, yPos+0.5);
+								break;
+						}
+						k++;
+					}
+				}
+
+				this.context.strokeStyle = GRAPH.yGridLineColor;
+				this.context.stroke();
+
+				this.context.restore();
+				
+			}
+
+			return this;
+			
+		},
+		
+		drawXGrid : function() {
+
+			if (GRAPH.drawGrid) {
+				/* Calculate the graphing area */
+				var xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+					xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width)-xStart,
+					yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height),
+					yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height)-yStart;
+
+				var drawed = 0,
+					yPos = 0,
+					xPos = 0,
+					k = 0;
+
+				this.context.save();
+
+				this.context.translate(xStart, yStart);
+
+				this.context.beginPath();
+				
+				for (var i = 1; i <= GRAPH.xGridNumLines-1; i++) {
+
+					xPos = Math.floor(i*xEnd/GRAPH.xGridNumLines);
+					drawed = 0;
+					this.context.moveTo(xPos, yEnd);
+					k = 0;
+					while (drawed < yEnd) {
+						/* Move from bottom to top */
+						switch (k%2) {
+							case 0:
+								drawed = (yEnd-drawed < GRAPH.yGridSpaceLength) ? yEnd : drawed+GRAPH.yGridSpaceLength;
+								this.context.moveTo(xPos+0.5, yEnd-drawed);
+								break;
+							case 1:
+								drawed = (yEnd-drawed < GRAPH.yGridLineLength) ? yEnd : drawed+GRAPH.yGridLineLength;
+								this.context.lineTo(xPos+0.5, yEnd-drawed);
+								break;
+						}
+						k++;
+					}
+				}
+
+				this.context.strokeStyle = GRAPH.xGridLineColor;
+				this.context.stroke();
+			}
+
+			return this;
+
+		},
+		
 		/*
 		 * Draws the grid using the specified options
 		 */
@@ -803,6 +927,12 @@ var Graph = (function() {
 		 */
 		clear : function() {
 
+			GRAPH.colorIndex = 0;
+			GRAPH.pointColorIndex = 0;
+			GRAPH.drawYAxisNumbers = true;
+			GRAPH.drawXAxisNumbers = true;
+			GRAPH.drawGrid = true;
+			
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 			return this;
