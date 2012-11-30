@@ -12,7 +12,10 @@ var Graph = (function() {
 		canvasId : "graph",
 		fontFamily : "sans-serif",
 		fontWeight : "normal",
-		fontSize : "10px",
+		fontSize : 10,
+		
+		titleFontSize : 12,
+		titleFontWeight: "bold",
 		
 		colorList : ["#00F","#0F0","#F00","#0FF","#F0F","#FF0"],
 		colorIndex : 0,
@@ -32,7 +35,7 @@ var Graph = (function() {
 		
 		barWidth : 1, // % width
 		barPosition : "left", // options are left, center, right. default: left.
-		barLabelRotate : 0, // clockwise angle in degrees, starting from horizontal position
+		barLabelRotate : 135, // clockwise angle in degrees, starting from horizontal position
 		
 		yAxisLeftMargin : 0.101010101, // 10.1 % width (30 mm from left) 
 		yAxisRightMargin : 0.05050505051, // 5.05 % width (15 mm from right)
@@ -854,7 +857,7 @@ var Graph = (function() {
 				this.context.save();
 
 				this.context.textBaseline = GRAPH.xAxisTextBaseline;
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+" "+GRAPH.fontFamily;
+				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
 				this.context.textAlign = GRAPH.xAxisTextAlign;
 
 				for (var i = 0; i <= GRAPH.xAxisNumSteps; i++) {
@@ -892,7 +895,7 @@ var Graph = (function() {
 				this.context.save();
 
 				this.context.textBaseline = GRAPH.yAxisTextBaseline;
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+" "+GRAPH.fontFamily;
+				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
 				this.context.textAlign = GRAPH.yAxisTextAlign;
 
 				for (var i = 0; i <= GRAPH.yAxisNumSteps; i++) {
@@ -919,9 +922,70 @@ var Graph = (function() {
 		 * @return {object} this
 		 */
 		drawLabels : function(labels) {
-			
+
+			/* Calculate the graphing area */
+			var xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width),
+				xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width),
+				yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height),
+				yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height);
+
+			var px = 0, 
+				py = 0,
+				rad = 0;
+
+			if (GRAPH.barLabelRotate == 0) {
+				this.context.textAlign = "center";
+			} else if (Math.abs(GRAPH.barLabelRotate) < 90) {
+				this.context.textAlign = "left";
+				rad = GRAPH.barLabelRotate*Math.PI/180;
+			} else {
+				this.context.textAlign = "right";
+				rad = -Math.PI+GRAPH.barLabelRotate*Math.PI/180;
+			}
+
+			for (var i = 0, len = labels.length; i < len; i++) {
+				this.context.save();
+
+				px = xStart+i*(xEnd-xStart)/len+(xEnd-xStart)/len/2;
+			 	py = yEnd+GRAPH.fontSize+3;
+
+				this.context.translate(px, py);
+				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
+				this.context.rotate(rad);
+
+				this.context.fillText(labels[i], 0, 0);
+
+				this.context.restore();
+			}
+
+			return this;
 		},
 
+		/*
+		 * Adds a title to the canvas
+		 * @param {string} title
+		 * @return {object} this
+		 */
+		drawTitle : function(title) {
+
+			var px = 0,
+				py = 0;
+
+			this.context.save();
+
+			this.context.textAlign = "center";
+			this.context.font = GRAPH.titleFontWeight+" "+GRAPH.titleFontSize+"px "+GRAPH.fontFamily;
+			
+			px = this.canvas.width/2;
+			py = (1-GRAPH.xAxisBottomMargin)*this.canvas.height/2;
+
+			this.context.fillText(title, px, py);
+
+			this.context.restore();
+			
+			return this;
+		},
+		
 		/*
 		 * Removes everything from the canvas
 		 */
