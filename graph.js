@@ -34,11 +34,11 @@ var Graph = (function() {
 		
 		bgColor : "#FFF",
 		
-		drawTitle : false,
+		drawTitle : true,
 		drawYAxis : 3, // 0: none, 1: left, 2: right, 3: both
 		drawYAxisNumbers : true,
 		drawYAxisMarks : true,
-		drawyAxisTitle : true,
+		drawYAxisTitle : true,
 		drawXAxis : 3, // 0: none, 1: bottom, 2: top, 3: both
 		drawXAxisNumbers : true,
 		drawXAxisMarks : true,
@@ -282,8 +282,10 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawTitle();
 			this.drawAxis();
-
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
 			this.drawXAxisNumbers(xMin, xMax);
 			this.drawYAxisNumbers(yMin, yMax);
 
@@ -414,7 +416,12 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawTitle();
+
 			this.drawAxis();
+
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
 
 			this.drawXAxisNumbers(xMin, xMax);
 			this.drawYAxisNumbers(yMin, yMax);
@@ -498,7 +505,12 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawTitle();
+
 			this.drawAxis();
+
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
 
 			this.numberOfGraphs++;
 
@@ -1131,7 +1143,7 @@ var Graph = (function() {
 
 				this.context.translate(px, py);
 				this.context.rotate(-Math.PI/2);
-				this.context.fillText((title ? title : GRAPH.xAxisTitle), 0, 0);
+				this.context.fillText((title ? title : GRAPH.yAxisTitle), 0, 0);
 
 				this.context.restore();	
 			}
