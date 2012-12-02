@@ -3,96 +3,6 @@
  * @email huertas.dani@gmail.com
  */
 var Graph = (function() {
-	
-		/* min and max values */
-	var xMin = 0,
-		xMax = 0,
-		yMin = 0,
-		yMax = 0,
-		/* Start and end points of the graph area */
-		xStart = 0,
-		xEnd = 0,
-		yStart = 0,
-		yEnd = 0;
-
-	var GRAPH = {
-		canvasWidth : 600,
-		canvasHeight : 600/Math.sqrt(2),
-		appendTo : "",
-		newWindow : false,
-		canvasId : "graph",
-		fontFamily : "sans-serif",
-		fontWeight : "normal",
-		fontSize : 10,
-		
-		title : "",
-		titleFontSize : 12,
-		titleFontWeight: "bold",
-		
-		colorList : ["#00F","#0F0","#F00","#0FF","#F0F","#FF0"],
-		colorIndex : 0,
-		
-		bgColor : "#FFF",
-		
-		drawTitle : true,
-		drawYAxis : 3, // 0: none, 1: left, 2: right, 3: both
-		drawYAxisNumbers : true,
-		drawYAxisMarks : true,
-		drawYAxisTitle : true,
-		drawXAxis : 3, // 0: none, 1: bottom, 2: top, 3: both
-		drawXAxisNumbers : true,
-		drawXAxisMarks : true,
-		drawXAxisTitle : true,
-		drawGrid : true,
-		drawPolarGrid : true,
-		
-		lineWidth : 1,
-		lineShowPoints : false,
-		
-		pointStroke : true,
-		pointFill : false,
-		pointRadius : 3,
-		pointColorIndex : 0,
-		
-		barWidth : 1, // % width
-		barPosition : "left", // options are left, center, right. default: left.
-		barLabelRotate : 0, // clockwise angle in degrees, starting from horizontal position
-		
-		yAxisLeftMargin : 0.101010101, // 10.1 % width (30 mm from left) 
-		yAxisRightMargin : 0.05050505051, // 5.05 % width (15 mm from right)
-		yAxisLineWidth : 1,
-		yAxisTextBaseline : "middle",
-		yAxisTextAlign : "right",
-		yAxisNumSteps : 6, // same as yGridNumLines
-		yAxisNumDecimals : 2,
-		yAxisMarkLength : 3, // Mark length in pixels
-		yAxisTitle : "",
-		
-		xAxisTopMargin : 0.9285714286, // 92.86 % height (15 mm from bottom)
-		xAxisBottomMargin : 0.9285714286, // 92.86 % height (15 mm from top)
-		xAxisLineWidth : 1,
-		xAxisTextBaseline : "top",
-		xAxisTextAlign : "center",
-		xAxisNumSteps : 8, // same as xGridNumLines
-		xAxisNumDecimals : 2,
-		xAxisMarkLength : 3, // Mark length in pixels
-		xAxisTitle : "",
-		
-		yGridNumLines : 6,
-		yGridLineLength : 1,
-		yGridSpaceLength : 4,
-		yGridLineColor : "#999",
-
-		xGridNumLines : 8,
-		xGridLineLength : 1,
-		xGridSpaceLength : 4,
-		xGridLineColor : "#999",
-		
-		polarGridNumLines : 24, // Number of lines (360 deg / 30 deg = 12)
-		polarGridLineLength : 1,
-		polarGridSpaceLength : 4,
-		polarGridColor : "#999"
-	};
 
 	/* helper functions */
 	function isArray(a) {
@@ -115,38 +25,129 @@ var Graph = (function() {
 	
 	function construct(options) {
 
+		this.GRAPH = {
+			canvasWidth : 600,
+			canvasHeight : 600/Math.sqrt(2),
+			appendTo : "",
+			newWindow : false,
+			canvasId : "graph",
+			fontFamily : "sans-serif",
+			fontWeight : "normal",
+			fontSize : 10,
+
+			title : "",
+			titleFontSize : 12,
+			titleFontWeight: "bold",
+
+			colorList : ["#0000FF","#8B00FF","#FF0000","#FF7F00","#FFFF00","#00FF00","#00FFFF",],
+			colorIndex : 0,
+
+			bgColor : "#FFF",
+
+			drawTitle : true,
+			drawYAxis : 3, // 0: none, 1: left, 2: right, 3: both
+			drawYAxisNumbers : true,
+			drawYAxisMarks : true,
+			drawYAxisTitle : true,
+			drawXAxis : 3, // 0: none, 1: bottom, 2: top, 3: both
+			drawXAxisNumbers : true,
+			drawXAxisMarks : true,
+			drawXAxisTitle : true,
+			drawGrid : true,
+			drawPolarGrid : true,
+
+			lineWidth : 1,
+			lineShowPoints : false,
+
+			pointStroke : true,
+			pointFill : false,
+			pointRadius : 3,
+			pointColorIndex : 0,
+
+			barWidth : 1, // % width
+			barPosition : "left", // options are left, center, right. default: left.
+			barLabelRotate : 0, // clockwise angle in degrees, starting from horizontal position
+
+			yAxisLeftMargin : 0.101010101, // 10.1 % width (30 mm from left) 
+			yAxisRightMargin : 0.05050505051, // 5.05 % width (15 mm from right)
+			yAxisLineWidth : 1,
+			yAxisTextBaseline : "middle",
+			yAxisTextAlign : "right",
+			yAxisNumSteps : 6, // same as yGridNumLines
+			yAxisNumDecimals : 2,
+			yAxisMarkLength : 3, // Mark length in pixels
+			yAxisTitle : "",
+
+			xAxisTopMargin : 0.9285714286, // 92.86 % height (15 mm from bottom)
+			xAxisBottomMargin : 0.9285714286, // 92.86 % height (15 mm from top)
+			xAxisLineWidth : 1,
+			xAxisTextBaseline : "top",
+			xAxisTextAlign : "center",
+			xAxisNumSteps : 8, // same as xGridNumLines
+			xAxisNumDecimals : 2,
+			xAxisMarkLength : 3, // Mark length in pixels
+			xAxisTitle : "",
+
+			yGridNumLines : 6,
+			yGridLineLength : 1,
+			yGridSpaceLength : 4,
+			yGridLineColor : "#999",
+
+			xGridNumLines : 8,
+			xGridLineLength : 1,
+			xGridSpaceLength : 4,
+			xGridLineColor : "#999",
+
+			polarGridNumLines : 24, // Number of lines (360 deg / 30 deg = 12)
+			polarGridLineLength : 1,
+			polarGridSpaceLength : 4,
+			polarGridColor : "#999"
+		};
+
+		/* min and max values */
+		this.xMin = 0;
+		this.xMax = 0;
+		this.xMin = 0;
+		this.yMax = 0;
+			
+		/* Start and end points of the graph area */
+		this.xStart = 0;
+		this.xEnd = 0;
+		this.yStart = 0;
+		this.yEnd = 0;
+
 		var haystack = [];
 
-		for (var elem in GRAPH) {
+		for (var elem in this.GRAPH) {
 			haystack.push(elem);
 		}
 
 		if (options instanceof Object) {
 			for (var elem in options) {
 				if (inArray(elem, haystack)) {
-					GRAPH[elem] = options[elem];
+					this.GRAPH[elem] = options[elem];
 				}
 			}
 		}
 
-		var width 	= GRAPH.canvasWidth+40,
-			height 	= GRAPH.canvasHeight+20,
-			id 		= GRAPH.canvasId;
+		var width 	= this.GRAPH.canvasWidth+40,
+			height 	= this.GRAPH.canvasHeight+20,
+			id 		= this.GRAPH.canvasId;
 
 		/* Create canvas for new graph */
 		this.canvas = document.createElement("canvas");
 
-		this.canvas.setAttribute("width", GRAPH.canvasWidth + "px");
-		this.canvas.setAttribute("height", GRAPH.canvasHeight + "px");
+		this.canvas.setAttribute("width", this.GRAPH.canvasWidth + "px");
+		this.canvas.setAttribute("height", this.GRAPH.canvasHeight + "px");
 
 		this.canvas.setAttribute("id", id);
 
-		if (GRAPH.newWindow) {
+		if (this.GRAPH.newWindow) {
 			/* append graph in a new window */
 			this.graphWindow = window.open('','',"width="+width+",height="+height);
 			this.elem = this.graphWindow.document.body;
 		} else {
-			this.elem = document.getElementById(GRAPH.appendTo);
+			this.elem = document.getElementById(this.GRAPH.appendTo);
 		}
 
 		this.elem.appendChild(this.canvas);
@@ -156,7 +157,7 @@ var Graph = (function() {
 		/* Set the background color */
 		this.context.save();
 		
-		this.context.fillStyle = GRAPH.bgColor;
+		this.context.fillStyle = this.GRAPH.bgColor;
 		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		
 		this.context.restore();
@@ -165,10 +166,10 @@ var Graph = (function() {
 		this.numberOfGraphs = 0;
 		
 		/* Start and end points of the graph area */
-		xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width);
-		xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width);
-		yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height);
-		yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height);
+		this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
+		this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
+		this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
+		this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
 
 	}
 
@@ -190,42 +191,42 @@ var Graph = (function() {
 
 			if (this.numberOfGraphs == 0) {
 				/* Max and Min values for each axis */
-				xMax = Math.max.apply(Math, x);
-				xMin = Math.min.apply(Math, x);
-				yMax = Math.max.apply(Math, y);
-				yMin = Math.min.apply(Math, y);
+				this.xMax = Math.max.apply(Math, x);
+				this.xMin = Math.min.apply(Math, x);
+				this.yMax = Math.max.apply(Math, y);
+				this.xMin = Math.min.apply(Math, y);
 
 				if (xRange instanceof Array) {
-					xMin = xRange[0];
-					xMax = xRange[1];
+					this.xMin = xRange[0];
+					this.xMax = xRange[1];
 				}
 
 				if (yRange instanceof Array) {
-					yMin = yRange[0];
-					yMax = yRange[1];
+					this.xMin = yRange[0];
+					this.yMax = yRange[1];
 				}
 			} else {
 				if (xRange instanceof Array) {
-					xRange[0] = xRange[0] < xMin ? xMin : xRange[0];
-					xRange[1] = xRange[1] > xMax ? xMax : xRange[1];
+					xRange[0] = xRange[0] < this.xMin ? this.xMin : xRange[0];
+					xRange[1] = xRange[1] > this.xMax ? this.xMax : xRange[1];
 				}
 
 				if (yRange instanceof Array) {
-					yRange[0] = yRange[0] < yMin ? yMin : yRange[0];
-					yRange[1] = yRange[1] > yMax ? yMax : yRange[1];
+					yRange[0] = yRange[0] < this.xMin ? this.xMin : yRange[0];
+					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
 				}
 			}
 
 			if ( ! (xRange instanceof Array)) {
 				xRange = [];
-				xRange.push(xMin);
-				xRange.push(xMax);
+				xRange.push(this.xMin);
+				xRange.push(this.xMax);
 			}
 
 			if ( ! (yRange instanceof Array)) {
 				yRange = [];
-				yRange.push(yMin);
-				yRange.push(yMax);
+				yRange.push(this.xMin);
+				yRange.push(this.yMax);
 			}
 
 			this.drawGrid();
@@ -233,17 +234,17 @@ var Graph = (function() {
 			this.context.save();
 
 			/* Stroke style */
-			this.context.strokeStyle = GRAPH.colorList[(GRAPH.colorIndex++%GRAPH.colorList.length)];
+			this.context.strokeStyle = this.GRAPH.colorList[(this.GRAPH.colorIndex++%this.GRAPH.colorList.length)];
 
-			this.context.translate(xStart, yStart);
+			this.context.translate(this.xStart, this.yStart);
 
 			this.context.beginPath();
 
 			for (var i = 0, len = y.length; i < len; i++) {
 
 				if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
-					px = (xEnd-xStart)*(x[i]-xMin)/(xMax-xMin);
-					py = (yEnd-yStart)*(1-(y[i]-yMin)/(yMax-yMin));
+					px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
+					py = (this.yEnd-this.yStart)*(1-(y[i]-this.xMin)/(this.yMax-this.xMin));
 					if (drawLine > 0) {
 						this.context.lineTo(px, py);
 					} else {
@@ -255,23 +256,23 @@ var Graph = (function() {
 				}
 			}
 
-			this.context.lineWidth = GRAPH.lineWidth;
+			this.context.lineWidth = this.GRAPH.lineWidth;
 			this.context.stroke();
 			
-			if (GRAPH.lineShowPoints) {
+			if (this.GRAPH.lineShowPoints) {
 				for (var i = 0, len = y.length; i < len; i++) {
 					if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
-						px = (xEnd-xStart)*(x[i]-xMin)/(xMax-xMin);
-						py = (yEnd-yStart)*(1-(y[i]-yMin)/(yMax-yMin));
+						px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
+						py = (this.yEnd-this.yStart)*(1-(y[i]-this.xMin)/(this.yMax-this.xMin));
 						this.context.beginPath();
-						this.context.arc(px, py, GRAPH.pointRadius, 0, Math.PI*2, false);
+						this.context.arc(px, py, this.GRAPH.pointRadius, 0, Math.PI*2, false);
 
-						if (GRAPH.pointStroke) {
-							this.context.lineWidth = GRAPH.lineWidth;
+						if (this.GRAPH.pointStroke) {
+							this.context.lineWidth = this.GRAPH.lineWidth;
 							this.context.stroke();
 						}
 
-						if (GRAPH.pointFill) {
+						if (this.GRAPH.pointFill) {
 							this.context.fill();
 						}
 
@@ -286,8 +287,8 @@ var Graph = (function() {
 			this.drawAxis();
 			this.drawXAxisTitle();
 			this.drawYAxisTitle();
-			this.drawXAxisNumbers(xMin, xMax);
-			this.drawYAxisNumbers(yMin, yMax);
+			this.drawXAxisNumbers(this.xMin, this.xMax);
+			this.drawYAxisNumbers(this.xMin, this.yMax);
 
 			this.numberOfGraphs++;
 
@@ -341,69 +342,69 @@ var Graph = (function() {
 
 			if (this.numberOfGraphs == 0) {
 				/* Max and Min values for each axis */
-				xMax = Math.max.apply(Math, x);
-				xMin = Math.min.apply(Math, x);
-				yMax = Math.max.apply(Math, y);
-				yMin = Math.min.apply(Math, y);
+				this.xMax = Math.max.apply(Math, x);
+				this.xMin = Math.min.apply(Math, x);
+				this.yMax = Math.max.apply(Math, y);
+				this.xMin = Math.min.apply(Math, y);
 
 				if (xRange instanceof Array) {
-					xMin = xRange[0];
-					xMax = xRange[1];
+					this.xMin = xRange[0];
+					this.xMax = xRange[1];
 				}
 
 				if (yRange instanceof Array) {
-					yMin = yRange[0];
-					yMax = yRange[1];
+					this.xMin = yRange[0];
+					this.yMax = yRange[1];
 				}
 			} else {
 				if (xRange instanceof Array) {
-					xRange[0] = xRange[0] < xMin ? xMin : xRange[0];
-					xRange[1] = xRange[1] > xMax ? xMax : xRange[1];
+					xRange[0] = xRange[0] < this.xMin ? this.xMin : xRange[0];
+					xRange[1] = xRange[1] > this.xMax ? this.xMax : xRange[1];
 				}
 
 				if (yRange instanceof Array) {
-					yRange[0] = yRange[0] < yMin ? yMin : yRange[0];
-					yRange[1] = yRange[1] > yMax ? yMax : yRange[1];
+					yRange[0] = yRange[0] < this.xMin ? this.xMin : yRange[0];
+					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
 				}
 			}
 
 			if ( ! (xRange instanceof Array)) {
 				xRange = [];
-				xRange.push(xMin);
-				xRange.push(xMax);
+				xRange.push(this.xMin);
+				xRange.push(this.xMax);
 			}
 
 			if ( ! (yRange instanceof Array)) {
 				yRange = [];
-				yRange.push(yMin);
-				yRange.push(yMax);
+				yRange.push(this.xMin);
+				yRange.push(this.yMax);
 			}
 
 			this.drawGrid();
-			GRAPH.drawGrid = false;
+			this.GRAPH.drawGrid = false;
 
 			this.context.save();
 
 			/* Stroke style */
-			this.context.strokeStyle = GRAPH.colorList[(GRAPH.colorIndex++%GRAPH.colorList.length)];
+			this.context.strokeStyle = this.GRAPH.colorList[(this.GRAPH.colorIndex++%this.GRAPH.colorList.length)];
 
-			this.context.translate(xStart, yStart);
+			this.context.translate(this.xStart, this.yStart);
 
 			for (var i = 0, len = y.length; i < len; i++) {
 
 				if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
-					px = (xEnd-xStart)*(x[i]-xMin)/(xMax-xMin);
-					py = (yEnd-yStart)*(1-(y[i]-yMin)/(yMax-yMin));
+					px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
+					py = (this.yEnd-this.yStart)*(1-(y[i]-this.xMin)/(this.yMax-this.xMin));
 
 					this.context.beginPath();
-					this.context.arc(px, py, GRAPH.pointRadius, 0, Math.PI*2, false);
+					this.context.arc(px, py, this.GRAPH.pointRadius, 0, Math.PI*2, false);
 
-					if (GRAPH.pointStroke) {
-						this.context.lineWidth = GRAPH.lineWidth;
+					if (this.GRAPH.pointStroke) {
+						this.context.lineWidth = this.GRAPH.lineWidth;
 						this.context.stroke();
 					}
 
-					if (GRAPH.pointFill) {
+					if (this.GRAPH.pointFill) {
 						this.context.fill();
 					}
 
@@ -411,7 +412,7 @@ var Graph = (function() {
 				}
 			}
 
-			this.context.lineWidth = GRAPH.lineWidth;
+			this.context.lineWidth = this.GRAPH.lineWidth;
 			this.context.stroke();
 
 			this.context.restore();
@@ -423,8 +424,8 @@ var Graph = (function() {
 			this.drawXAxisTitle();
 			this.drawYAxisTitle();
 
-			this.drawXAxisNumbers(xMin, xMax);
-			this.drawYAxisNumbers(yMin, yMax);
+			this.drawXAxisNumbers(this.xMin, this.xMax);
+			this.drawYAxisNumbers(this.xMin, this.yMax);
 
 			this.numberOfGraphs++;
 
@@ -441,29 +442,29 @@ var Graph = (function() {
 
 			if (this.numberOfGraphs == 0) {
 				/* Max and Min values for each axis */
-				xMax = Math.max.apply(Math, x);
-				xMin = Math.min.apply(Math, x);
-				yMax = Math.max.apply(Math, y);
-				yMin = Math.min.apply(Math, y);
+				this.xMax = Math.max.apply(Math, x);
+				this.xMin = Math.min.apply(Math, x);
+				this.yMax = Math.max.apply(Math, y);
+				this.xMin = Math.min.apply(Math, y);
 
 				if (yRange instanceof Array) {
-					yMin = yRange[0];
-					yMax = yRange[1];
+					this.xMin = yRange[0];
+					this.yMax = yRange[1];
 				}
 			} else {
 				if (yRange instanceof Array) {
-					yRange[0] = yRange[0] < yMin ? yMin : yRange[0];
-					yRange[1] = yRange[1] > yMax ? yMax : yRange[1];
+					yRange[0] = yRange[0] < this.xMin ? this.xMin : yRange[0];
+					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
 				}
 			}
 
 			if ( ! (yRange instanceof Array)) {
 				yRange = [];
-				yRange.push(yMin);
-				yRange.push(yMax);
+				yRange.push(this.xMin);
+				yRange.push(this.yMax);
 			}
 
-			this.drawYAxisNumbers(yMin, yMax);
+			this.drawYAxisNumbers(this.xMin, this.yMax);
 
 			this.drawYGrid();
 			
@@ -471,19 +472,19 @@ var Graph = (function() {
 
 			this.context.save();
 
-			this.context.translate(xStart, yStart);
+			this.context.translate(this.xStart, this.yStart);
 
 			for (var i = 0; i < y.length; i++) {
 				/* top left corner position */
-				px = i*(xEnd-xStart)/y.length;
-				py = (yEnd-yStart)*(1-y[i]/yMax);
+				px = i*(this.xEnd-this.xStart)/y.length;
+				py = (this.yEnd-this.yStart)*(1-y[i]/this.yMax);
 
-				switch (GRAPH.barPosition) {
+				switch (this.GRAPH.barPosition) {
 					case "center":
-						px += (1-GRAPH.barWidth)*(xEnd-xStart)/y.length/2;
+						px += (1-this.GRAPH.barWidth)*(this.xEnd-this.xStart)/y.length/2;
 						break;
 					case "right":
-						px += (1-GRAPH.barWidth)*(xEnd-xStart)/y.length;
+						px += (1-this.GRAPH.barWidth)*(this.xEnd-this.xStart)/y.length;
 						break;
 					case "left":
 					default:
@@ -493,13 +494,13 @@ var Graph = (function() {
 				}
 
 				/* width and height of the rectangle */
-				width = GRAPH.barWidth*(xEnd-xStart)/y.length;
-				height = (yEnd-yStart)*y[i]/yMax;
+				width = this.GRAPH.barWidth*(this.xEnd-this.xStart)/y.length;
+				height = (this.yEnd-this.yStart)*y[i]/this.yMax;
 				
 				this.context.beginPath();
 				this.context.rect(px, py, width, height);
 				
-				this.context.fillStyle = GRAPH.colorList[(GRAPH.colorIndex++%GRAPH.colorList.length)];
+				this.context.fillStyle = this.GRAPH.colorList[(this.GRAPH.colorIndex++%this.GRAPH.colorList.length)];
 				this.context.fill();
 			}
 
@@ -524,9 +525,34 @@ var Graph = (function() {
 		 * @param {array} x (array of bar centers | number of bars)
 		 */
 		histogram : function(y, x) {
-			// x is an array: plot x.length bars, each centered in x[i]
+
+			/* Max and Min values for each axis */
+			this.yMax = Math.max.apply(Math, y);
+			this.xMin = Math.min.apply(Math, y);
+
+			var elements, bins;
 			
-			// x is a number: create x bars
+			if (x instanceof Array) {
+				this.xMax = Math.max.apply(Math, x);
+				this.xMin = Math.min.apply(Math, x);
+				// x is an array: plot x.length bars, each centered in x[i]
+			} else if (typeof x == "number") {
+				// x is a number: create x bars
+				elements = new Array(x);
+				bins = [];
+
+				for (var i = 0; i < x; i++) {
+					elements[i] = 0;
+					bins.push(i);
+				}
+
+				for (var i = 0, len = y.length; i < len; i++) {
+					elements[Math.floor(y[i]*x)]++;
+				}
+
+				return this.bars(elements, bins);
+			}
+			
 		},
 		
 		/* 
@@ -539,7 +565,7 @@ var Graph = (function() {
 		},
 
 		/*
-		 * Draws the y axis. This function uses GRAPH.drawYAxis:
+		 * Draws the y axis. This function uses this.GRAPH.drawYAxis:
 		 *   0: no axis is drawn
 		 *   1: left side y axis is drawn
 		 *   2: right side y axis is drawn
@@ -551,55 +577,55 @@ var Graph = (function() {
 				py = 0;
 			
 				/* Start and end points of the graph area 
-				xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width);
-				xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width);
-				yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height);
-				yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height);
+				this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
+				this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
+				this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
+				this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
 				*/
 			this.context.save();
 
-			switch (GRAPH.drawYAxis) {
+			switch (this.GRAPH.drawYAxis) {
 				default:
 				case 1: // left y axis
 					this.context.beginPath();
-					this.context.moveTo(xStart-0.5, yStart);
-					this.context.lineTo(xStart-0.5, yEnd);
+					this.context.moveTo(this.xStart-0.5, this.yStart);
+					this.context.lineTo(this.xStart-0.5, this.yEnd);
 
-					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.stroke();
 					
 					/* draw marks */
-					if (GRAPH.drawYAxisMarks) {
+					if (this.GRAPH.drawYAxisMarks) {
 						this.context.beginPath();
-						for (var i = 0; i < GRAPH.yAxisNumSteps; i++) {
-							px = xStart+0.5;
-							py = yStart+Math.floor(i*(yEnd-yStart)/GRAPH.yAxisNumSteps);
+						for (var i = 0; i < this.GRAPH.yAxisNumSteps; i++) {
+							px = this.xStart+0.5;
+							py = this.yStart+Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
 							this.context.moveTo(px, py+0.5);
-							this.context.lineTo(px+GRAPH.yAxisMarkLength, py+0.5);
+							this.context.lineTo(px+this.GRAPH.yAxisMarkLength, py+0.5);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 						}
 					}
 					break;
 				case 2: // right y axis
 					this.context.beginPath();
-					this.context.moveTo(xEnd+0.5, yStart);
-					this.context.lineTo(xEnd+0.5, yEnd);
+					this.context.moveTo(this.xEnd+0.5, this.yStart);
+					this.context.lineTo(this.xEnd+0.5, this.yEnd);
 
-					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.stroke();
 					
 					/* draw marks */
-					if (GRAPH.drawYAxisMarks) {
+					if (this.GRAPH.drawYAxisMarks) {
 						this.context.beginPath();
-						for (var i = 0; i < GRAPH.yAxisNumSteps; i++) {
-							px = xEnd-0.5;
-							py = yStart+Math.floor(i*(yEnd-yStart)/GRAPH.yAxisNumSteps);
+						for (var i = 0; i < this.GRAPH.yAxisNumSteps; i++) {
+							px = this.xEnd-0.5;
+							py = this.yStart+Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
 							this.context.moveTo(px, py+0.5);
-							this.context.lineTo(px-GRAPH.yAxisMarkLength, py+0.5);
+							this.context.lineTo(px-this.GRAPH.yAxisMarkLength, py+0.5);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 						}
 					}
@@ -607,38 +633,38 @@ var Graph = (function() {
 				case 3: 
 					// left and right y axis
 					this.context.beginPath();
-					this.context.moveTo(xStart-0.5, yStart);
-					this.context.lineTo(xStart-0.5, yEnd);
+					this.context.moveTo(this.xStart-0.5, this.yStart);
+					this.context.lineTo(this.xStart-0.5, this.yEnd);
 
-					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.stroke();
 
 					// right y axis
 					this.context.beginPath();
-					this.context.moveTo(xEnd+0.5, yStart);
-					this.context.lineTo(xEnd+0.5, yEnd);
+					this.context.moveTo(this.xEnd+0.5, this.yStart);
+					this.context.lineTo(this.xEnd+0.5, this.yEnd);
 
-					this.context.lineWidth = GRAPH.yAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.stroke();
 					
 					/* draw marks */
-					if (GRAPH.drawYAxisMarks) {
+					if (this.GRAPH.drawYAxisMarks) {
 						this.context.beginPath();
-						for (var i = 1; i < GRAPH.yAxisNumSteps; i++) {
-							px = xStart+0.5;
-							py = yStart+Math.floor(i*(yEnd-yStart)/GRAPH.yAxisNumSteps);
+						for (var i = 1; i < this.GRAPH.yAxisNumSteps; i++) {
+							px = this.xStart+0.5;
+							py = this.yStart+Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
 							this.context.moveTo(px, py+0.5);
-							this.context.lineTo(px+GRAPH.yAxisMarkLength, py+0.5);
+							this.context.lineTo(px+this.GRAPH.yAxisMarkLength, py+0.5);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 							
-							px = xEnd-0.5;
-							py = yStart+Math.floor(i*(yEnd-yStart)/GRAPH.yAxisNumSteps);
+							px = this.xEnd-0.5;
+							py = this.yStart+Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
 							this.context.moveTo(px, py+0.5);
-							this.context.lineTo(px-GRAPH.yAxisMarkLength, py+0.5);
+							this.context.lineTo(px-this.GRAPH.yAxisMarkLength, py+0.5);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 						}
 					}
@@ -654,7 +680,7 @@ var Graph = (function() {
 		},
 
 		/*
-		 * Draws the x axis. This function uses GRAPH.drawXAxis:
+		 * Draws the x axis. This function uses this.GRAPH.drawXAxis:
 		 *   0: no axis is drawn
 		 *   1: bottom x axis is drawn
 		 *   2: top x axis is drawn
@@ -667,28 +693,28 @@ var Graph = (function() {
 
 			this.context.save();
 
-			switch (GRAPH.drawXAxis) {
+			switch (this.GRAPH.drawXAxis) {
 				default:
 				case 1:
 					// bottom x axis
 					this.context.beginPath();
 
-					this.context.moveTo(xStart-0.5, yEnd+0.5);
-					this.context.lineTo(xEnd+0.5, yEnd+0.5);
+					this.context.moveTo(this.xStart-0.5, this.yEnd+0.5);
+					this.context.lineTo(this.xEnd+0.5, this.yEnd+0.5);
 
-					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.xAxisLineWidth;
 					this.context.stroke();
 
 					/* draw marks */
-					if (GRAPH.drawXAxisMarks) {
+					if (this.GRAPH.drawXAxisMarks) {
 						this.context.beginPath();
-						for (var i = GRAPH.xAxisNumSteps; i > 0; i--) {
-							px = xStart+Math.floor(i*(xEnd-xStart)/GRAPH.xAxisNumSteps)+0.5;
-							py = yEnd-0.5;
+						for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
+							px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+							py = this.yEnd-0.5;
 							this.context.moveTo(px, py);
-							this.context.lineTo(px, py-GRAPH.xAxisMarkLength);
+							this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 						}
 					}
@@ -697,22 +723,22 @@ var Graph = (function() {
 					// top x axis
 					this.context.beginPath();
 
-					this.context.moveTo(xStart-0.5, yStart-0.5);
-					this.context.lineTo(xEnd+0.5, yStart-0.5);
+					this.context.moveTo(this.xStart-0.5, this.yStart-0.5);
+					this.context.lineTo(this.xEnd+0.5, this.yStart-0.5);
 
-					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.xAxisLineWidth;
 					this.context.stroke();
 
 					/* draw marks */
-					if (GRAPH.drawXAxisMarks) {
+					if (this.GRAPH.drawXAxisMarks) {
 						this.context.beginPath();
-						for (var i = GRAPH.xAxisNumSteps; i > 0; i--) {
-							px = xStart+Math.floor(i*(xEnd-xStart)/GRAPH.xAxisNumSteps)+0.5;
-							py = yStart+0.5;
+						for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
+							px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+							py = this.yStart+0.5;
 							this.context.moveTo(px, py);
-							this.context.lineTo(px, py+GRAPH.yAxisMarkLength);
+							this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 						}
 					}
@@ -721,39 +747,39 @@ var Graph = (function() {
 					// bottom x axis
 					this.context.beginPath();
 
-					this.context.moveTo(xStart-0.5, yEnd+0.5);
-					this.context.lineTo(xEnd+0.5, yEnd+0.5);
+					this.context.moveTo(this.xStart-0.5, this.yEnd+0.5);
+					this.context.lineTo(this.xEnd+0.5, this.yEnd+0.5);
 
-					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.xAxisLineWidth;
 					this.context.stroke();
 
 					// top x axis
 					this.context.beginPath();
 
-					this.context.moveTo(xStart-0.5, yStart-0.5);
-					this.context.lineTo(xEnd+0.5, yStart-0.5);
+					this.context.moveTo(this.xStart-0.5, this.yStart-0.5);
+					this.context.lineTo(this.xEnd+0.5, this.yStart-0.5);
 
-					this.context.lineWidth = GRAPH.xAxisLineWidth;
+					this.context.lineWidth = this.GRAPH.xAxisLineWidth;
 					this.context.stroke();
 
 					/* draw marks */
-					if (GRAPH.drawXAxisMarks) {
+					if (this.GRAPH.drawXAxisMarks) {
 						this.context.beginPath();
-						for (var i = GRAPH.xAxisNumSteps; i > 0; i--) {
-							px = xStart+Math.floor(i*(xEnd-xStart)/GRAPH.xAxisNumSteps)+0.5;
-							py = yEnd-0.5;
+						for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
+							px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+							py = this.yEnd-0.5;
 							this.context.moveTo(px, py);
-							this.context.lineTo(px, py-GRAPH.xAxisMarkLength);
+							this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 
-							px = xStart+Math.floor(i*(xEnd-xStart)/GRAPH.xAxisNumSteps)+0.5;
-							py = yStart+0.5;
+							px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+							py = this.yStart+0.5;
 							this.context.moveTo(px, py);
-							this.context.lineTo(px, py+GRAPH.yAxisMarkLength);
+							this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
 
-							this.context.lineWidth = GRAPH.yAxisLineWidth;
+							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.stroke();
 						}
 					}
@@ -771,19 +797,19 @@ var Graph = (function() {
 		 */
 		drawAxis : function() {
 
-			if (GRAPH.drawYAxis) {
+			if (this.GRAPH.drawYAxis) {
 				this.drawYAxis();
 			}
 
 			/* draw y axis only one time */
-			GRAPH.drawYAxis = false;
+			this.GRAPH.drawYAxis = false;
 
-			if (GRAPH.drawXAxis) {
+			if (this.GRAPH.drawXAxis) {
 				this.drawXAxis();	
 			}
 
 			/* draw x axis only one time */
-			GRAPH.drawXAxis = false;
+			this.GRAPH.drawXAxis = false;
 
 			return this;
 
@@ -796,44 +822,44 @@ var Graph = (function() {
 				xPos = 0,
 				k = 0;
 
-			if (GRAPH.drawGrid) {
+			if (this.GRAPH.drawGrid) {
 
 				this.context.save();
 
-				this.context.translate(xStart, yStart);
+				this.context.translate(this.xStart, this.yStart);
 
 				this.context.beginPath();
 
-				for (var i = 1; i <= GRAPH.yGridNumLines-1; i++) {
+				for (var i = 1; i <= this.GRAPH.yGridNumLines-1; i++) {
 
-					yPos = Math.floor(i*(yEnd-yStart)/GRAPH.yGridNumLines);
+					yPos = Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yGridNumLines);
 					drawed = 0;
-					this.context.moveTo(xStart, yPos);
+					this.context.moveTo(this.xStart, yPos);
 					k = 0;
 
-					while (drawed < (xEnd-xStart)) {
+					while (drawed < (this.xEnd-this.xStart)) {
 						/* Move from left to right */
 						switch (k%2) {
 							case 0:
-								drawed = ((xEnd-xStart)-drawed < GRAPH.xGridSpaceLength) ? (xEnd-xStart) : drawed+GRAPH.xGridSpaceLength;
-								this.context.moveTo((xEnd-xStart)-drawed, yPos+0.5);
+								drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridSpaceLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridSpaceLength;
+								this.context.moveTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
 								break;
 							case 1:
-								drawed = ((xEnd-xStart)-drawed < GRAPH.xGridLineLength) ? (xEnd-xStart) : drawed+GRAPH.xGridLineLength;
-								this.context.lineTo((xEnd-xStart)-drawed, yPos+0.5);
+								drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridLineLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridLineLength;
+								this.context.lineTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
 								break;
 						}
 						k++;
 					}
 				}
 
-				this.context.strokeStyle = GRAPH.yGridLineColor;
+				this.context.strokeStyle = this.GRAPH.yGridLineColor;
 				this.context.stroke();
 
 				this.context.restore();
 			}
 
-			GRAPH.drawPolarGrid = false;
+			this.GRAPH.drawPolarGrid = false;
 
 			return this;
 		},
@@ -845,37 +871,37 @@ var Graph = (function() {
 				xPos = 0,
 				k = 0;
 
-			if (GRAPH.drawGrid) {
+			if (this.GRAPH.drawGrid) {
 
 				this.context.save();
 
-				this.context.translate(xStart, yStart);
+				this.context.translate(this.xStart, this.yStart);
 
 				this.context.beginPath();
 				
-				for (var i = 1; i <= GRAPH.xGridNumLines-1; i++) {
+				for (var i = 1; i <= this.GRAPH.xGridNumLines-1; i++) {
 
-					xPos = Math.floor(i*(xEnd-xStart)/GRAPH.xGridNumLines);
+					xPos = Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xGridNumLines);
 					drawed = 0;
-					this.context.moveTo(xPos, (yEnd-yStart));
+					this.context.moveTo(xPos, (this.yEnd-this.yStart));
 					k = 0;
-					while (drawed < (yEnd-yStart)) {
+					while (drawed < (this.yEnd-this.yStart)) {
 						/* Move from bottom to top */
 						switch (k%2) {
 							case 0:
-								drawed = ((yEnd-yStart)-drawed < GRAPH.yGridSpaceLength) ? (yEnd-yStart) : drawed+GRAPH.yGridSpaceLength;
-								this.context.moveTo(xPos+0.5, (yEnd-yStart)-drawed);
+								drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
+								this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
 								break;
 							case 1:
-								drawed = ((yEnd-yStart)-drawed < GRAPH.yGridLineLength) ? (yEnd-yStart) : drawed+GRAPH.yGridLineLength;
-								this.context.lineTo(xPos+0.5, (yEnd-yStart)-drawed);
+								drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
+								this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
 								break;
 						}
 						k++;
 					}
 				}
 
-				this.context.strokeStyle = GRAPH.xGridLineColor;
+				this.context.strokeStyle = this.GRAPH.xGridLineColor;
 				this.context.stroke();
 				
 				this.context.restore();
@@ -889,14 +915,14 @@ var Graph = (function() {
 		 */
 		drawGrid : function() {
 
-			if (GRAPH.drawGrid) {
+			if (this.GRAPH.drawGrid) {
 				this.drawXGrid();
 				this.drawYGrid();
 			}
 			
-			GRAPH.drawGrid = false;
+			this.GRAPH.drawGrid = false;
 
-			if (GRAPH.drawPolarGrid) {
+			if (this.GRAPH.drawPolarGrid) {
 				this.drawPolarGrid();
 			}
 
@@ -910,32 +936,32 @@ var Graph = (function() {
 		drawPolarGrid : function() {
 
 			var alfa = 0,
-				beta = Math.atan2(yEnd-yStart,xEnd-xStart),
+				beta = Math.atan2(this.yEnd-this.yStart,this.xEnd-this.xStart),
 				h, 
 				k, 
 				drawLine = 0, 
 				drawed = 0;
 
-			if (GRAPH.drawPolarGrid) {
+			if (this.GRAPH.drawPolarGrid) {
 
 				this.context.save();
 
-				this.context.translate(xStart+(xEnd-xStart)/2, yStart+(yEnd-yStart)/2);
+				this.context.translate(this.xStart+(this.xEnd-this.xStart)/2, this.yStart+(this.yEnd-this.yStart)/2);
 
-				for (var i = 0; i < GRAPH.polarGridNumLines; i++) {
+				for (var i = 0; i < this.GRAPH.polarGridNumLines; i++) {
 
-					alfa = i*Math.PI*2/GRAPH.polarGridNumLines;
+					alfa = i*Math.PI*2/this.GRAPH.polarGridNumLines;
 
 					if (alfa < beta) {
-						h = (xEnd-xStart)/2/Math.cos(alfa);
+						h = (this.xEnd-this.xStart)/2/Math.cos(alfa);
 					} else if (alfa >= beta && alfa < Math.PI-beta) {
-						h = (yEnd-yStart)/2/Math.cos(Math.PI/2-alfa);
+						h = (this.yEnd-this.yStart)/2/Math.cos(Math.PI/2-alfa);
 					} else if (alfa >= Math.PI-beta && alfa < Math.PI+beta) {
-						h = (xEnd-xStart)/2/Math.abs(Math.cos(alfa));
+						h = (this.xEnd-this.xStart)/2/Math.abs(Math.cos(alfa));
 					} else if (alfa >= Math.PI+beta && alfa < 2*Math.PI-beta) {
-						h = (yEnd-yStart)/2/Math.abs(Math.cos(Math.PI/2-alfa));
+						h = (this.yEnd-this.yStart)/2/Math.abs(Math.cos(Math.PI/2-alfa));
 					} else {
-						h = (xEnd-xStart)/2/Math.cos(alfa);
+						h = (this.xEnd-this.xStart)/2/Math.cos(alfa);
 					}
 
 					/* Draw a dotted line from the center */
@@ -945,27 +971,27 @@ var Graph = (function() {
 					while (drawed < h) {
 						switch (k%2) {
 							case 0:
-								drawed = (h-drawed < GRAPH.polarGridSpaceLength) ? h : drawed+GRAPH.polarGridSpaceLength;
+								drawed = (h-drawed < this.GRAPH.polarGridSpaceLength) ? h : drawed+this.GRAPH.polarGridSpaceLength;
 								this.context.moveTo(drawed, -0.5);
 								break;
 							case 1:
-								drawed = (h-drawed < GRAPH.polarGridLineLength) ? h : drawed+GRAPH.polarGridLineLength;
+								drawed = (h-drawed < this.GRAPH.polarGridLineLength) ? h : drawed+this.GRAPH.polarGridLineLength;
 								this.context.lineTo(drawed, -0.5);
 								break;
 						}
 						k++;
 					}
 
-					this.context.rotate(Math.PI*2/GRAPH.polarGridNumLines);
+					this.context.rotate(Math.PI*2/this.GRAPH.polarGridNumLines);
 				}
 
-				this.context.strokeStyle = GRAPH.polarGridLineColor;
+				this.context.strokeStyle = this.GRAPH.polarGridLineColor;
 				this.context.stroke();
 
 				this.context.restore();
 			}
 
-			GRAPH.drawPolarGrid = false;
+			this.GRAPH.drawPolarGrid = false;
 
 			return this;
 		},
@@ -977,26 +1003,26 @@ var Graph = (function() {
 		 */
 		drawXAxisNumbers : function(start, end) {
 
-			if (GRAPH.drawXAxisNumbers) {
+			if (this.GRAPH.drawXAxisNumbers) {
 				this.context.save();
 
-				this.context.textBaseline = GRAPH.xAxisTextBaseline;
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
-				this.context.textAlign = GRAPH.xAxisTextAlign;
+				this.context.textBaseline = this.GRAPH.xAxisTextBaseline;
+				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
+				this.context.textAlign = this.GRAPH.xAxisTextAlign;
 
-				for (var i = 0; i <= GRAPH.xAxisNumSteps; i++) {
+				for (var i = 0; i <= this.GRAPH.xAxisNumSteps; i++) {
 					this.context.fillText(
-						(start+i*(end-start)/GRAPH.xAxisNumSteps)
-							.toFixed(GRAPH.xAxisNumDecimals), 
-						xStart+i*(xEnd-xStart)/GRAPH.xAxisNumSteps, 
-						yEnd+3 /* 3px top margin from axis */);
+						(start+i*(end-start)/this.GRAPH.xAxisNumSteps)
+							.toFixed(this.GRAPH.xAxisNumDecimals), 
+						this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps, 
+						this.yEnd+3 /* 3px top margin from axis */);
 				}
 
 				this.context.restore();
 			}
 
 			/* Disable redrawing again the axis numbers. The first plot will set the scale */
-			GRAPH.drawXAxisNumbers = false;
+			this.GRAPH.drawXAxisNumbers = false;
 
 			return this;
 
@@ -1009,26 +1035,26 @@ var Graph = (function() {
 		 */
 		drawYAxisNumbers : function(start, end) {
 
-			if (GRAPH.drawYAxisNumbers) {
+			if (this.GRAPH.drawYAxisNumbers) {
 				this.context.save();
 
-				this.context.textBaseline = GRAPH.yAxisTextBaseline;
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
-				this.context.textAlign = GRAPH.yAxisTextAlign;
+				this.context.textBaseline = this.GRAPH.yAxisTextBaseline;
+				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
+				this.context.textAlign = this.GRAPH.yAxisTextAlign;
 
-				for (var i = 0; i <= GRAPH.yAxisNumSteps; i++) {
+				for (var i = 0; i <= this.GRAPH.yAxisNumSteps; i++) {
 					this.context.fillText(
-						(end-i*(end-start)/GRAPH.yAxisNumSteps)
-							.toFixed(GRAPH.yAxisNumDecimals), 
-						xStart-5 /* 3px right margin from axis */, 
-						yStart+i*(yEnd-yStart)/GRAPH.yAxisNumSteps);
+						(end-i*(end-start)/this.GRAPH.yAxisNumSteps)
+							.toFixed(this.GRAPH.yAxisNumDecimals), 
+						this.xStart-5 /* 3px right margin from axis */, 
+						this.yStart+i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
 				}
 
 				this.context.restore();
 			}
 
 			/* Disable redrawing again the axis numbers. The first plot will set the scale */
-			GRAPH.drawYAxisNumbers = false;
+			this.GRAPH.drawYAxisNumbers = false;
 
 			return this;
 
@@ -1045,24 +1071,34 @@ var Graph = (function() {
 				py = 0,
 				rad = 0;
 
-			if (GRAPH.barLabelRotate == 0) {
+			if (this.GRAPH.barLabelRotate == 0) {
 				this.context.textAlign = "center";
-			} else if (Math.abs(GRAPH.barLabelRotate) < 90) {
+			} else if (Math.abs(this.GRAPH.barLabelRotate) < 90) {
 				this.context.textAlign = "left";
-				rad = GRAPH.barLabelRotate*Math.PI/180;
+				rad = this.GRAPH.barLabelRotate*Math.PI/180;
 			} else {
 				this.context.textAlign = "right";
-				rad = -Math.PI+GRAPH.barLabelRotate*Math.PI/180;
+				rad = -Math.PI+this.GRAPH.barLabelRotate*Math.PI/180;
 			}
 
-			for (var i = 0, len = labels.length; i < len; i++) {
+			var m = 1;
+
+			if (this.yEnd-this.yStart < labels.length*8) {
+				// Labels doesn't fit!
+				m = Math.floor(labels.length*8/250);
+				
+				// length < 60 m = 1
+				// length 
+			}
+
+			for (var i = 0, len = labels.length; i < len; i+=m) {
 				this.context.save();
 
-				px = xStart+i*(xEnd-xStart)/len+(xEnd-xStart)/len/2;
-			 	py = yEnd+GRAPH.fontSize+3;
+				px = this.xStart+i*(this.xEnd-this.xStart)/len+(this.xEnd-this.xStart)/len/2;
+			 	py = this.yEnd+this.GRAPH.fontSize+3;
 
 				this.context.translate(px, py);
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
+				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 				this.context.rotate(rad);
 
 				this.context.fillText(labels[i], 0, 0);
@@ -1083,17 +1119,17 @@ var Graph = (function() {
 			var px = 0,
 				py = 0;
 
-			if (title || GRAPH.drawTitle) {
+			if (title || this.GRAPH.drawTitle) {
 
 				this.context.save();
 
 				this.context.textAlign = "center";
-				this.context.font = GRAPH.titleFontWeight+" "+GRAPH.titleFontSize+"px "+GRAPH.fontFamily;
+				this.context.font = this.GRAPH.titleFontWeight+" "+this.GRAPH.titleFontSize+"px "+this.GRAPH.fontFamily;
 
-				px = xStart + (xEnd-xStart)/2;
-				py = (1-GRAPH.xAxisBottomMargin)*this.canvas.height/2;
+				px = this.xStart + (this.xEnd-this.xStart)/2;
+				py = (1-this.GRAPH.xAxisBottomMargin)*this.canvas.height/2;
 
-				this.context.fillText((title ? title : GRAPH.title), px, py);
+				this.context.fillText((title ? title : this.GRAPH.title), px, py);
 
 				this.context.restore();
 			}
@@ -1106,19 +1142,19 @@ var Graph = (function() {
 			var px = 0,
 				py = 0;
 
-			if (title || GRAPH.drawXAxisTitle) {
+			if (title || this.GRAPH.drawXAxisTitle) {
 
 				this.context.save();
 
 				this.context.textAlign = "center";
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
+				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 
-				px = xStart + (xEnd-xStart)/2;
+				px = this.xStart + (this.xEnd-this.xStart)/2;
 				py = this.canvas.height - 
-					(1-GRAPH.xAxisTopMargin)*this.canvas.height/2
-					+ GRAPH.fontSize; // top margin for x axis title
+					(1-this.GRAPH.xAxisTopMargin)*this.canvas.height/2
+					+ this.GRAPH.fontSize; // top margin for x axis title
 
-				this.context.fillText((title ? title : GRAPH.xAxisTitle), px, py);
+				this.context.fillText((title ? title : this.GRAPH.xAxisTitle), px, py);
 
 				this.context.restore();	
 			}
@@ -1131,19 +1167,19 @@ var Graph = (function() {
 			var px = 0,
 				py = 0;
 
-			if (title || GRAPH.drawYAxisTitle) {
+			if (title || this.GRAPH.drawYAxisTitle) {
 
 				this.context.save();
 
 				this.context.textAlign = "center";
-				this.context.font = GRAPH.fontWeight+" "+GRAPH.fontSize+"px "+GRAPH.fontFamily;
+				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 
-				px = GRAPH.yAxisLeftMargin*this.canvas.width/2;
-				py = yStart+(yEnd-yStart)/2;
+				px = this.GRAPH.yAxisLeftMargin*this.canvas.width/2;
+				py = this.yStart+(this.yEnd-this.yStart)/2;
 
 				this.context.translate(px, py);
 				this.context.rotate(-Math.PI/2);
-				this.context.fillText((title ? title : GRAPH.yAxisTitle), 0, 0);
+				this.context.fillText((title ? title : this.GRAPH.yAxisTitle), 0, 0);
 
 				this.context.restore();	
 			}
@@ -1155,23 +1191,23 @@ var Graph = (function() {
 
 			var haystack = [];
 
-			for (var elem in GRAPH) {
+			for (var elem in this.GRAPH) {
 				haystack.push(elem);
 			}
 
 			if (options instanceof Object) {
 				for (var elem in options) {
 					if (inArray(elem, haystack)) {
-						GRAPH[elem] = options[elem];
+						this.GRAPH[elem] = options[elem];
 					}
 				}
 			}
 
 			/* Start and end points of the graph area */
-			xStart = Math.floor(GRAPH.yAxisLeftMargin*this.canvas.width);
-			xEnd = Math.floor((1-GRAPH.yAxisRightMargin)*this.canvas.width);
-			yStart = Math.floor((1-GRAPH.xAxisTopMargin)*this.canvas.height);
-			yEnd = Math.floor(GRAPH.xAxisTopMargin*this.canvas.height);
+			this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
+			this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
+			this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
+			this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
 
 			return this;
 		},
@@ -1181,11 +1217,11 @@ var Graph = (function() {
 		 */
 		clear : function() {
 
-			GRAPH.colorIndex = 0;
-			GRAPH.pointColorIndex = 0;
-			GRAPH.drawYAxisNumbers = true;
-			GRAPH.drawXAxisNumbers = true;
-			GRAPH.drawGrid = true;
+			this.GRAPH.colorIndex = 0;
+			this.GRAPH.pointColorIndex = 0;
+			this.GRAPH.drawYAxisNumbers = true;
+			this.GRAPH.drawXAxisNumbers = true;
+			this.GRAPH.drawGrid = true;
 
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -1212,7 +1248,7 @@ var Graph = (function() {
  *  ______________________________________________________________________________________
  * |                  A                                                                   |              A
  * |       ___________|______________________________________________________________     |              |
- * |  yMax|           |                                                  A           |<-->|              |
+ * |  this.yMax|           |                                                  A           |<-->|              |
  * |      |           |                                                  |           |  yAxisRightMargin |
  * |      |           |                                                  |           |    |   (%)        |
  * |      |           | xAxisTopMargin (%)                               |           |    |              |
@@ -1220,7 +1256,7 @@ var Graph = (function() {
  * | yAxisLeftMargin  |                                                  |           |    |              |
  * |      |(%)        |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
- * |      |           |                   GRAPHING AREA                  |           |    |        canvas height
+ * |      |           |                   this.GRAPHING AREA                  |           |    |        canvas height
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
@@ -1228,8 +1264,8 @@ var Graph = (function() {
  * |      |           |                            xAxisBottomMargin (%) |           |    |              |
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
- * |  yMax|___________V__________________________________________________|___________|    |              |
- * |       xMin                                                          |       xMax     |              |
+ * |  this.yMax|___________V__________________________________________________|___________|    |              |
+ * |       this.xMin                                                          |       this.xMax     |              |
  * |_____________________________________________________________________V________________|              V
  *
  * <------------------------------------ canvas width ------------------------------------>
