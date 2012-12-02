@@ -1085,10 +1085,8 @@ var Graph = (function() {
 
 			if (this.yEnd-this.yStart < labels.length*8) {
 				// Labels doesn't fit!
+				// This 8/250 constant has been calculated with trial and error
 				m = Math.floor(labels.length*8/250);
-				
-				// length < 60 m = 1
-				// length 
 			}
 
 			for (var i = 0, len = labels.length; i < len; i+=m) {
