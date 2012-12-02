@@ -1168,6 +1168,15 @@ var Graph = (function() {
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 			return this;
+		},
+		
+		toImage : function(mime) {
+
+			var image = new Image();
+
+			image.src = this.canvas.toDataURL(mime ? mime : "image/png");
+
+			return image;
 		}
 	}
 
