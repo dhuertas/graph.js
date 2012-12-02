@@ -32,6 +32,8 @@ var Graph = (function() {
 		colorList : ["#00F","#0F0","#F00","#0FF","#F0F","#FF0"],
 		colorIndex : 0,
 		
+		bgColor : "#FFF",
+		
 		drawTitle : false,
 		drawYAxis : 3, // 0: none, 1: left, 2: right, 3: both
 		drawYAxisNumbers : true,
@@ -151,6 +153,14 @@ var Graph = (function() {
 
 		this.context = this.canvas.getContext("2d");
 
+		/* Set the background color */
+		this.context.save();
+		
+		this.context.fillStyle = GRAPH.bgColor;
+		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		
+		this.context.restore();
+		
 		/* Number of plotted graphs */
 		this.numberOfGraphs = 0;
 		
