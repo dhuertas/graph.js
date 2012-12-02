@@ -32,11 +32,13 @@ var Graph = (function() {
 		colorList : ["#00F","#0F0","#F00","#0FF","#F0F","#FF0"],
 		colorIndex : 0,
 		
-		drawTitle : false,
+		bgColor : "#FFF",
+		
+		drawTitle : true,
 		drawYAxis : 3, // 0: none, 1: left, 2: right, 3: both
 		drawYAxisNumbers : true,
 		drawYAxisMarks : true,
-		drawyAxisTitle : true,
+		drawYAxisTitle : true,
 		drawXAxis : 3, // 0: none, 1: bottom, 2: top, 3: both
 		drawXAxisNumbers : true,
 		drawXAxisMarks : true,
@@ -151,6 +153,14 @@ var Graph = (function() {
 
 		this.context = this.canvas.getContext("2d");
 
+		/* Set the background color */
+		this.context.save();
+		
+		this.context.fillStyle = GRAPH.bgColor;
+		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		
+		this.context.restore();
+		
 		/* Number of plotted graphs */
 		this.numberOfGraphs = 0;
 		
@@ -272,8 +282,10 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawTitle();
 			this.drawAxis();
-
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
 			this.drawXAxisNumbers(xMin, xMax);
 			this.drawYAxisNumbers(yMin, yMax);
 
@@ -404,7 +416,12 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawTitle();
+
 			this.drawAxis();
+
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
 
 			this.drawXAxisNumbers(xMin, xMax);
 			this.drawYAxisNumbers(yMin, yMax);
@@ -488,7 +505,12 @@ var Graph = (function() {
 
 			this.context.restore();
 
+			this.drawTitle();
+
 			this.drawAxis();
+
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
 
 			this.numberOfGraphs++;
 
@@ -1121,7 +1143,7 @@ var Graph = (function() {
 
 				this.context.translate(px, py);
 				this.context.rotate(-Math.PI/2);
-				this.context.fillText((title ? title : GRAPH.xAxisTitle), 0, 0);
+				this.context.fillText((title ? title : GRAPH.yAxisTitle), 0, 0);
 
 				this.context.restore();	
 			}
@@ -1168,6 +1190,15 @@ var Graph = (function() {
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 			return this;
+		},
+		
+		toImage : function(mime) {
+
+			var image = new Image();
+
+			image.src = this.canvas.toDataURL(mime ? mime : "image/png");
+
+			return image;
 		}
 	}
 

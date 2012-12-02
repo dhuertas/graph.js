@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<script src="../graph.js" type="text/javascript"></script>
+		<!-- Syntax highlighter CDN -->
+		<link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+		<link href="http://alexgorbatchev.com/pub/sh/current/styles/shCore.css" rel="stylesheet" type="text/css" />
+
+		<script src="http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js" type="text/javascript"></script>
+		<script src="http://alexgorbatchev.com/pub/sh/current/scripts/shAutoloader.js" type="text/javascript"></script>
+		<script src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJScript.js" type="text/javascript"></script>	
+
+	</head>
+	<style>
+		body {width: 100%;
+			margin: 0;
+			padding: 0;
+			
+			font-family: "Helvetica Neue";
+			font-size: 12px;
+			color: #333;
+		}
+
+		#container {
+			width: 800px;
+			margin: 50px auto;
+		}
+	</style>
+	<body>
+		
+		<div id="container">
+			<h1>Plot Bars</h1>
+			<p>Plot bar charts. See example below:</p>
+			<pre class="brush: js">
+				var graph = new Graph({
+					appendTo : "container",
+					canvasWidth : 800,
+					canvasHeight : 800/Math.sqrt(2),
+					title : "Number of skipped lectures by months",
+					xAxisTitle : "Months",
+					yAxisTitle : "Skipped Lectures",
+					colorList : ["#00F"],
+					barWidth: 0.8,
+					barPosition: "center",
+					xAxisNumSteps:12,
+					yAxisNumSteps: 10,
+					yGridNumLines: 10,
+					drawYAxis : 1,
+					drawXAxis : 1
+				});
+				
+			
+				var px, py;
+			
+				py = [3,5,4,1,7,0,0,0,6,8,3,10];
+				px = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+			
+				graph.bars(py, px, false, [0,12]);</pre>
+		</div>
+	
+		<script type="text/javascript" charset="utf-8">
+			var graph = new Graph({
+				appendTo : "container",
+				canvasWidth : 800,
+				canvasHeight : 800/Math.sqrt(2),
+				title : "Number of skipped lectures by months",
+				xAxisTitle : "Months",
+				yAxisTitle : "Skipped Lectures",
+				colorList : ["#00F"],
+				barWidth: 0.8,
+				barPosition: "center",
+				xAxisNumSteps:12,
+				yAxisNumSteps: 10,
+				yGridNumLines: 10,
+				drawYAxis : 1,
+				drawXAxis : 1
+			});
+			
+			var px, py;
+			
+			py = [3,5,4,1,7,0,0,0,6,8,3,10];
+			px = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+			
+			graph.bars(py, px, [0,10]);
+
+		    SyntaxHighlighter.all();
+		</script>
+	</body>
+</html>
