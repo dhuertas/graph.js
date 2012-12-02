@@ -445,7 +445,7 @@ var Graph = (function() {
 				this.xMax = Math.max.apply(Math, x);
 				this.xMin = Math.min.apply(Math, x);
 				this.yMax = Math.max.apply(Math, y);
-				this.xMin = Math.min.apply(Math, y);
+				this.yMin = Math.min.apply(Math, y);
 
 				if (yRange instanceof Array) {
 					this.xMin = yRange[0];
@@ -464,7 +464,7 @@ var Graph = (function() {
 				yRange.push(this.yMax);
 			}
 
-			this.drawYAxisNumbers(this.xMin, this.yMax);
+			this.drawYAxisNumbers(this.yMin > 0 ? 0 : this.yMin, this.yMax);
 
 			this.drawYGrid();
 			
@@ -530,8 +530,16 @@ var Graph = (function() {
 			this.yMax = Math.max.apply(Math, y);
 			this.yMin = Math.min.apply(Math, y);
 
-			var elements = [], bins = [], index;
+			var frec = [], bins = [], index;
 			
+			if (this.numberOfGraphs == 0) {
+				/* Max and Min values for each axis */
+				//this.xMax = Math.max.apply(Math, x);
+				//this.xMin = Math.min.apply(Math, x);
+				this.yMax = Math.max.apply(Math, y);
+				this.yMin = Math.min.apply(Math, y);
+			}
+
 			if (x instanceof Array) {
 				this.xMax = Math.max.apply(Math, x);
 				this.xMin = Math.min.apply(Math, x);
@@ -539,24 +547,80 @@ var Graph = (function() {
 				
 			} else if (typeof x == "number") {
 				// x is a number: create x bars
+				this.xMax = Math.max.apply(Math, y);
+				this.xMin = Math.min.apply(Math, y);
+				
 				for (var i = 0; i < x; i++) {
-					elements.push(0);
-					bins.push(((this.yMax-this.yMin)*i/x).toFixed(this.GRAPH.xAxisNumDecimals));
+					frec.push(0);
+					bins.push((this.yMax-this.yMin)*i/x);
 				}
 
 				for (var i = 0, len = y.length; i < len; i++) {
 					index = Math.floor((x)*(y[i]-this.yMin)/(this.yMax-this.yMin));
-					console.log(index);
-					elements[index]++;
+					frec[index]++;
 				}
 
 				/* Remove the upper bound frec. and add it to the last element */
-				elements.pop();
-				elements[elements.length-1]++;
-				
-				return this.bars(elements, bins);
+				frec.pop();
+				frec[frec.length-1]++;
 			}
+
+			this.yMax = Math.max.apply(Math, frec);
+			this.yMin = Math.min.apply(Math, frec);
+			//this.xMax = Math.max.apply(Math, bins);
+			//this.xMin = Math.min.apply(Math, bins);
 			
+			this.drawYAxisNumbers( this.yMin > 0 ? 0 : this.yMin, this.yMax);
+			this.drawXAxisNumbers(this.xMin, this.xMax);
+			
+			this.drawYGrid();
+
+			this.context.save();
+
+			this.context.translate(this.xStart, this.yStart);
+
+			for (var i = 0; i < frec.length; i++) {
+				/* top left corner position */
+				px = i*(this.xEnd-this.xStart)/frec.length;
+				py = (this.yEnd-this.yStart)*(1-frec[i]/this.yMax);
+
+				switch (this.GRAPH.barPosition) {
+					case "center":
+						px += (1-this.GRAPH.barWidth)*(this.xEnd-this.xStart)/frec.length/2;
+						break;
+					case "right":
+						px += (1-this.GRAPH.barWidth)*(this.xEnd-this.xStart)/frec.length;
+						break;
+					case "left":
+					default:
+						px += 0;
+						break;
+					
+				}
+
+				/* width and height of the rectangle */
+				width = this.GRAPH.barWidth*(this.xEnd-this.xStart)/frec.length;
+				height = (this.yEnd-this.yStart)*frec[i]/this.yMax;
+				
+				this.context.beginPath();
+				this.context.rect(px, py, width, height);
+				
+				this.context.fillStyle = this.GRAPH.colorList[(this.GRAPH.colorIndex++%this.GRAPH.colorList.length)];
+				this.context.fill();
+			}
+
+			this.context.restore();
+
+			this.drawTitle();
+
+			this.drawAxis();
+
+			this.drawXAxisTitle();
+			this.drawYAxisTitle();
+
+			this.numberOfGraphs++;
+
+			return this;
 		},
 
 		/*
@@ -1081,7 +1145,7 @@ var Graph = (function() {
 			if (this.yEnd-this.yStart < labels.length*8) {
 				// Labels doesn't fit!
 				// This 8/250 constant has been calculated with trial and error
-				m = Math.floor(labels.length*8/250);
+				m = Math.floor(labels.length*10/250);
 			}
 
 			for (var i = 0, len = labels.length; i < len; i+=m) {
