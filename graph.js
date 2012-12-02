@@ -528,39 +528,34 @@ var Graph = (function() {
 
 			/* Max and Min values for each axis */
 			this.yMax = Math.max.apply(Math, y);
-			this.xMin = Math.min.apply(Math, y);
+			this.yMin = Math.min.apply(Math, y);
 
-			var elements, bins;
+			var elements = [], bins = [], index;
 			
 			if (x instanceof Array) {
 				this.xMax = Math.max.apply(Math, x);
 				this.xMin = Math.min.apply(Math, x);
 				// x is an array: plot x.length bars, each centered in x[i]
+				
 			} else if (typeof x == "number") {
 				// x is a number: create x bars
-				elements = new Array(x);
-				bins = [];
-
 				for (var i = 0; i < x; i++) {
-					elements[i] = 0;
-					bins.push(i);
+					elements.push(0);
+					bins.push(((this.yMax-this.yMin)*i/x).toFixed(this.GRAPH.xAxisNumDecimals));
 				}
 
 				for (var i = 0, len = y.length; i < len; i++) {
-					elements[Math.floor(y[i]*x)]++;
+					index = Math.floor((x)*(y[i]-this.yMin)/(this.yMax-this.yMin));
+					console.log(index);
+					elements[index]++;
 				}
 
+				/* Remove the upper bound frec. and add it to the last element */
+				elements.pop();
+				elements[elements.length-1]++;
+				
 				return this.bars(elements, bins);
 			}
-			
-		},
-		
-		/* 
-		 * Plots a pie chart 
-		 * @param {array} y (values)
-		 * @param {array} x (labels)
-		 */
-		pie : function(y, x) {
 			
 		},
 
