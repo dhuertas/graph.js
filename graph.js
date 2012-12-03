@@ -345,7 +345,7 @@ var Graph = (function() {
 				this.xMax = Math.max.apply(Math, x);
 				this.xMin = Math.min.apply(Math, x);
 				this.yMax = Math.max.apply(Math, y);
-				this.xMin = Math.min.apply(Math, y);
+				this.yMin = Math.min.apply(Math, y);
 
 				if (xRange instanceof Array) {
 					this.xMin = xRange[0];
@@ -353,7 +353,7 @@ var Graph = (function() {
 				}
 
 				if (yRange instanceof Array) {
-					this.xMin = yRange[0];
+					this.yMin = yRange[0];
 					this.yMax = yRange[1];
 				}
 			} else {
