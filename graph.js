@@ -194,7 +194,7 @@ var Graph = (function() {
 				this.xMax = Math.max.apply(Math, x);
 				this.xMin = Math.min.apply(Math, x);
 				this.yMax = Math.max.apply(Math, y);
-				this.xMin = Math.min.apply(Math, y);
+				this.yMin = Math.min.apply(Math, y);
 
 				if (xRange instanceof Array) {
 					this.xMin = xRange[0];
@@ -202,7 +202,7 @@ var Graph = (function() {
 				}
 
 				if (yRange instanceof Array) {
-					this.xMin = yRange[0];
+					this.yMin = yRange[0];
 					this.yMax = yRange[1];
 				}
 			} else {
@@ -212,7 +212,7 @@ var Graph = (function() {
 				}
 
 				if (yRange instanceof Array) {
-					yRange[0] = yRange[0] < this.xMin ? this.xMin : yRange[0];
+					yRange[0] = yRange[0] < this.yMin ? this.yMin : yRange[0];
 					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
 				}
 			}
@@ -225,7 +225,7 @@ var Graph = (function() {
 
 			if ( ! (yRange instanceof Array)) {
 				yRange = [];
-				yRange.push(this.xMin);
+				yRange.push(this.yMin);
 				yRange.push(this.yMax);
 			}
 
@@ -244,7 +244,7 @@ var Graph = (function() {
 
 				if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
 					px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
-					py = (this.yEnd-this.yStart)*(1-(y[i]-this.xMin)/(this.yMax-this.xMin));
+					py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
 					if (drawLine > 0) {
 						this.context.lineTo(px, py);
 					} else {
@@ -263,7 +263,7 @@ var Graph = (function() {
 				for (var i = 0, len = y.length; i < len; i++) {
 					if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
 						px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
-						py = (this.yEnd-this.yStart)*(1-(y[i]-this.xMin)/(this.yMax-this.xMin));
+						py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
 						this.context.beginPath();
 						this.context.arc(px, py, this.GRAPH.pointRadius, 0, Math.PI*2, false);
 
@@ -363,7 +363,7 @@ var Graph = (function() {
 				}
 
 				if (yRange instanceof Array) {
-					yRange[0] = yRange[0] < this.xMin ? this.xMin : yRange[0];
+					yRange[0] = yRange[0] < this.yMin ? this.yMin : yRange[0];
 					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
 				}
 			}
@@ -376,7 +376,7 @@ var Graph = (function() {
 
 			if ( ! (yRange instanceof Array)) {
 				yRange = [];
-				yRange.push(this.xMin);
+				yRange.push(this.yMin);
 				yRange.push(this.yMax);
 			}
 
@@ -394,7 +394,7 @@ var Graph = (function() {
 
 				if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
 					px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
-					py = (this.yEnd-this.yStart)*(1-(y[i]-this.xMin)/(this.yMax-this.xMin));
+					py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
 
 					this.context.beginPath();
 					this.context.arc(px, py, this.GRAPH.pointRadius, 0, Math.PI*2, false);
@@ -425,7 +425,7 @@ var Graph = (function() {
 			this.drawYAxisTitle();
 
 			this.drawXAxisNumbers(this.xMin, this.xMax);
-			this.drawYAxisNumbers(this.xMin, this.yMax);
+			this.drawYAxisNumbers(this.yMin, this.yMax);
 
 			this.numberOfGraphs++;
 
@@ -448,19 +448,19 @@ var Graph = (function() {
 				this.yMin = Math.min.apply(Math, y);
 
 				if (yRange instanceof Array) {
-					this.xMin = yRange[0];
+					this.yMin = yRange[0];
 					this.yMax = yRange[1];
 				}
 			} else {
 				if (yRange instanceof Array) {
-					yRange[0] = yRange[0] < this.xMin ? this.xMin : yRange[0];
+					yRange[0] = yRange[0] < this.yMin ? this.yMin : yRange[0];
 					yRange[1] = yRange[1] > this.yMax ? this.yMax : yRange[1];
 				}
 			}
 
 			if ( ! (yRange instanceof Array)) {
 				yRange = [];
-				yRange.push(this.xMin);
+				yRange.push(this.yMin);
 				yRange.push(this.yMax);
 			}
 
@@ -1305,7 +1305,7 @@ var Graph = (function() {
  *  ______________________________________________________________________________________
  * |                  A                                                                   |              A
  * |       ___________|______________________________________________________________     |              |
- * |  this.yMax|           |                                                  A           |<-->|              |
+ * | yMax |           |                                                  A           |<-->|              |
  * |      |           |                                                  |           |  yAxisRightMargin |
  * |      |           |                                                  |           |    |   (%)        |
  * |      |           | xAxisTopMargin (%)                               |           |    |              |
@@ -1313,7 +1313,7 @@ var Graph = (function() {
  * | yAxisLeftMargin  |                                                  |           |    |              |
  * |      |(%)        |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
- * |      |           |                   this.GRAPHING AREA                  |           |    |        canvas height
+ * |      |           |                   this.GRAPHING AREA             |           |    |        canvas height
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
@@ -1321,8 +1321,8 @@ var Graph = (function() {
  * |      |           |                            xAxisBottomMargin (%) |           |    |              |
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
- * |  this.yMax|___________V__________________________________________________|___________|    |              |
- * |       this.xMin                                                          |       this.xMax     |              |
+ * | yMax |___________V__________________________________________________|___________|    |              |
+ * |            xMin                                                     |       xMax     |              |
  * |_____________________________________________________________________V________________|              V
  *
  * <------------------------------------ canvas width ------------------------------------>
