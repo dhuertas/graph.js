@@ -1176,20 +1176,22 @@ var Graph = (function() {
 			var px = 0,
 				py = 0;
 
-			if (title || this.GRAPH.drawTitle) {
+			if (this.GRAPH.drawTitle) {
 
 				this.context.save();
 
 				this.context.textAlign = "center";
 				this.context.font = this.GRAPH.titleFontWeight+" "+this.GRAPH.titleFontSize+"px "+this.GRAPH.fontFamily;
-
-				px = this.xStart + (this.xEnd-this.xStart)/2;
-				py = (1-this.GRAPH.xAxisBottomMargin)*this.canvas.height/2;
+				
+				px = Math.floor(this.xStart + (this.xEnd-this.xStart)/2);
+				py = Math.floor((1-this.GRAPH.xAxisBottomMargin)*this.canvas.height/2);
 
 				this.context.fillText((title ? title : this.GRAPH.title), px, py);
 
 				this.context.restore();
 			}
+
+			this.GRAPH.drawTitle = false;
 
 			return this;
 		},
@@ -1199,10 +1201,11 @@ var Graph = (function() {
 			var px = 0,
 				py = 0;
 
-			if (title || this.GRAPH.drawXAxisTitle) {
+			if (this.GRAPH.drawXAxisTitle) {
 
 				this.context.save();
 
+				this.context.textBaseline = "middle";
 				this.context.textAlign = "center";
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 
@@ -1216,6 +1219,8 @@ var Graph = (function() {
 				this.context.restore();	
 			}
 
+			this.GRAPH.drawXAxisTitle = false;
+
 			return this;
 		},
 
@@ -1224,10 +1229,11 @@ var Graph = (function() {
 			var px = 0,
 				py = 0;
 
-			if (title || this.GRAPH.drawYAxisTitle) {
+			if (this.GRAPH.drawYAxisTitle) {
 
 				this.context.save();
 
+				this.context.textBaseline = "middle";
 				this.context.textAlign = "center";
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 
@@ -1240,6 +1246,8 @@ var Graph = (function() {
 
 				this.context.restore();	
 			}
+
+			this.GRAPH.drawYAxisTitle = false;
 
 			return this;
 		},
