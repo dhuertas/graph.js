@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<title>Graph.js - Plot Points</title>
+		<title>Graph.js - Histogram</title>
 		<script src="../graph.js" type="text/javascript"></script>
 	</head>
 	<style>
@@ -31,28 +31,28 @@
 	<body>
 		
 		<div id="container">
-			<h1>Plot Points</h1>
-			<p>Plot points on a 2D graph. See example below:</p>
+			<h1>Histogram</h1>
+			<p>Plots a histogram. The following example plots the Gaussian distribution of a Box Müller algorithm. See example below:</p>
 			<pre>
 var graph = new Graph({
 	appendTo : "container",
 	canvasWidth : 800,
 	canvasHeight : 800/Math.sqrt(2),
-	title : "Box Müller",
-	xAxisTitle : "x",
-	yAxisTitle : "y"
-});
+	colorList : ["#00F"],
+	barWidth : 0.8,
+	barPosition : "center",
+	title : "Box Müller Histogram"
+}); 
 
-var px = [], py = [];
-
+var y = [];
+			
 for (var i = 0; i < 1000; i++) {
 	r = Math.random();
 	s = Math.random();
-	py.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
-	px.push(Math.sqrt(-2*Math.log(1-r))*Math.sin(Math.PI*2*s));
+	y.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
 }
 
-graph.plotPoints(py, px);</pre>
+graph.histogram(y, 40);</pre>
 		</div>
 	
 		<script type="text/javascript" charset="utf-8">
@@ -60,21 +60,22 @@ graph.plotPoints(py, px);</pre>
 				appendTo : "container",
 				canvasWidth : 800,
 				canvasHeight : 800/Math.sqrt(2),
-				title : "Box Müller",
-				xAxisTitle : "x",
-				yAxisTitle : "y"
-			});
-			
-			var px = [], py = [];
-			
+				colorList : ["#00F"],
+				barWidth : 0.8,
+				barPosition : "center",
+				title : "Box Müller Histogram",
+				yAxisTitle : "samples"
+			}); 
+
+			var y = [];
+
 			for (var i = 0; i < 1000; i++) {
 				r = Math.random();
 				s = Math.random();
-				py.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
-				px.push(Math.sqrt(-2*Math.log(1-r))*Math.sin(Math.PI*2*s));
+				y.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
 			}
-			
-			graph.plotPoints(py, px);
+
+			graph.histogram(y, 40);
 		</script>
 	</body>
 </html>
