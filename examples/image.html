@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Graph.js - Image</title>
+		<script src="../graph.js" type="text/javascript"></script>
+	</head>
+	<style>
+		body {width: 100%;
+			margin: 0;
+			padding: 0;
+			
+			font-family: "Helvetica Neue";
+			font-size: 12px;
+			color: #333;
+		}
+
+		#container {
+			width: 800px;
+			margin: 50px auto;
+		}
+		
+		pre {
+			width: 778px;
+			color: #333;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 3px;
+		}
+	</style>
+	<body>
+		
+		<div id="container">
+			<h1>To Image</h1>
+			<p>Export the generated graph to an image. The image is exported to png 
+				format by default although the user is able to change it passing it 
+				as argument. See example below:</p>
+			<pre>
+var PI = Math.PI,
+    abs = Math.abs,
+    cos = Math.cos;
+
+var B = 0, // roll-off factor
+    T = 0; // symbol period
+
+function raisedCosine(f /* frequency */) {
+    if (abs(f) <= (1-B)/2/T) {
+        return T;
+    } else if ((1-B)/2/T < abs(f) && abs(f) <= (1+B)/2/T) {
+        return (T/2)*(1+cos((PI*T/B)*(abs(f)-(1-B)/2/T)));
+    } else {
+        return 0;
+    }
+}
+
+var graph = new Graph({
+    canvasWidth : 800,
+    canvasHeight : 800/Math.sqrt(2),
+    barPosition : "center",
+    title : "Raised Cosine Filter (frequency domain)",
+    yAxisTitle : "Response",
+    xAxisTitle : "Frequency (f)"
+}); 
+
+T = 0.001;
+			
+for (var i = 0; i <= 1; i += 0.2) {
+    B = i;
+    graph.plotFunction(raisedCosine, [-1/T, 1, 1/T], [0, T]);
+}
+
+document.getElementById("container").appendChild(graph.toImage());</pre>
+		</div>
+	
+		<script type="text/javascript" charset="utf-8">
+			var PI = Math.PI,
+				abs = Math.abs,
+				cos = Math.cos;
+
+			var B = 0, // roll-off factor
+				T = 0; // symbol period
+
+			function raisedCosine(f /* frequency */) {
+				if (abs(f) <= (1-B)/2/T) {
+					return T;
+				} else if ((1-B)/2/T < abs(f) && abs(f) <= (1+B)/2/T) {
+					return (T/2)*(1+cos((PI*T/B)*(abs(f)-(1-B)/2/T)));
+				} else {
+					return 0;
+				}
+			}
+		
+			var graph = new Graph({
+				canvasWidth : 800,
+				canvasHeight : 800/Math.sqrt(2),
+				barPosition : "center",
+				title : "Raised Cosine Filter (frequency domain)",
+				yAxisTitle : "Response",
+				xAxisTitle : "Frequency (f)"
+			}); 
+
+			T = 0.001;
+			
+			for (var i = 0; i <= 1; i += 0.2) {
+				B = i;
+				graph.plotFunction(raisedCosine, [-1/T, 1, 1/T], [0, T]);
+			}
+
+			document.getElementById("container").appendChild(graph.toImage());
+		</script>
+	</body>
+</html>
