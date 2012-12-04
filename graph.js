@@ -98,7 +98,7 @@ var Graph = (function() {
 			xGridSpaceLength : 4,
 			xGridLineColor : "#999",
 
-			polarGridNumLines : 24, // Number of lines (360 deg / 30 deg = 12)
+			polarGridNumLines : 24, // Number of lines (360 deg / 15 deg = 24)
 			polarGridLineLength : 1,
 			polarGridSpaceLength : 4,
 			polarGridColor : "#999"
@@ -146,11 +146,13 @@ var Graph = (function() {
 			/* append graph in a new window */
 			this.graphWindow = window.open('','',"width="+width+",height="+height);
 			this.elem = this.graphWindow.document.body;
-		} else {
+			this.elem.appendChild(this.canvas);
+		} else if (this.GRAPH.appendTo) {
 			this.elem = document.getElementById(this.GRAPH.appendTo);
+			this.elem.appendChild(this.canvas);
+		} else {
+			
 		}
-
-		this.elem.appendChild(this.canvas);
 
 		this.context = this.canvas.getContext("2d");
 
