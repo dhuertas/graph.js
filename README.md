@@ -25,6 +25,7 @@ Where to start? Browse some examples to see how it works:
 - [Bar charts](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/bars.html)
 - [Histogram graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/histogram.html)
 - [Export graph to an image](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/image.html)
+
 **Documentation**
 
 Under construction.
