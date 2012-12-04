@@ -288,7 +288,7 @@ var Graph = (function() {
 			this.drawXAxisTitle();
 			this.drawYAxisTitle();
 			this.drawXAxisNumbers(this.xMin, this.xMax);
-			this.drawYAxisNumbers(this.xMin, this.yMax);
+			this.drawYAxisNumbers(this.yMin, this.yMax);
 
 			this.numberOfGraphs++;
 
