@@ -43,13 +43,10 @@ var graph = new Graph({
     appendTo : "container",
     canvasWidth : 800,
     canvasHeight : 800/Math.sqrt(2),
-    barPosition : "center",
     title : "Half-wave Dipole Antenna Radiation",
     yAxisTitle : "y",
     xAxisTitle : "x",
-
-    drawGrid : false, // hide the default grid
-    drawPolarGrid : true
+    polarAxisNumFormat : "rad"
 }); 
 
 var px = [],
@@ -63,7 +60,7 @@ for (var theta = 0; theta <= 2*PI; theta += 0.01) {
     py.push(r*sin(theta));
 }
 
-graph.plot(py, px);</pre>
+graph.polar(py, px);</pre>
 		</div>
 	
 		<script type="text/javascript" charset="utf-8">
@@ -80,8 +77,7 @@ graph.plot(py, px);</pre>
 				title : "Half-wave Dipole Antenna Radiation",
 				yAxisTitle : "y",
 				xAxisTitle : "x",
-				drawGrid : false,
-				drawPolarGrid : true
+				polarAxisNumFormat : "rad"
 			}); 
 
 			var px = [],
@@ -90,13 +86,11 @@ graph.plot(py, px);</pre>
 			for (var theta = 0; theta <= 2*PI; theta += 0.01) {
 				r = 1-pow(sin(theta), 2);
 				
-				r = r/2;
-				
 				px.push(r*cos(theta));
 				py.push(r*sin(theta));
 			}
 
-			graph.plot(py, px);
+			graph.polar(py, px);
 		</script>
 	</body>
 </html>
