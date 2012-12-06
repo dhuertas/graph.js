@@ -72,7 +72,7 @@ graph.polar(py, px);</pre>
 			var graph = new Graph({
 				appendTo : "container",
 				canvasWidth : 800,
-				canvasHeight : 800/Math.sqrt(2),
+				canvasHeight : 800,
 				barPosition : "center",
 				title : "Half-wave Dipole Antenna Radiation",
 				yAxisTitle : "y",
@@ -90,7 +90,7 @@ graph.polar(py, px);</pre>
 				py.push(r*sin(theta));
 			}
 
-			graph.polar(py, px);
+			graph.polar(py, px, [-1,1], [-1,1]);
 		</script>
 	</body>
 </html>
