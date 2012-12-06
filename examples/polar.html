@@ -42,7 +42,7 @@ var PI = Math.PI,
 var graph = new Graph({
     appendTo : "container",
     canvasWidth : 800,
-    canvasHeight : 800/Math.sqrt(2),
+    canvasHeight : 800,
     title : "Half-wave Dipole Antenna Radiation",
     yAxisTitle : "y",
     xAxisTitle : "x",
@@ -60,7 +60,7 @@ for (var theta = 0; theta <= 2*PI; theta += 0.01) {
     py.push(r*sin(theta));
 }
 
-graph.polar(py, px);</pre>
+graph.polar(py, px, [-1,1], [-1,1]);</pre>
 		</div>
 	
 		<script type="text/javascript" charset="utf-8">
