@@ -54,8 +54,8 @@ var Graph = (function() {
 			drawXAxisMarks : true,
 			drawXAxisTitle : true,
 			drawGrid : true,
-			drawPolarGrid : true,
-			drawPolarAxis : true,
+			drawPolarGrid : false,
+			drawPolarAxis : false,
 
 			lineWidth : 1,
 			lineShowPoints : false,
