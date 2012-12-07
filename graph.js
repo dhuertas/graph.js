@@ -559,11 +559,9 @@ var Graph = (function() {
 			this.yMin = Math.min.apply(Math, y);
 
 			var frec = [], bins = [], index;
-			
+
 			if (this.numberOfGraphs == 0) {
 				/* Max and Min values for each axis */
-				//this.xMax = Math.max.apply(Math, x);
-				//this.xMin = Math.min.apply(Math, x);
 				this.yMax = Math.max.apply(Math, y);
 				this.yMin = Math.min.apply(Math, y);
 			}
@@ -572,7 +570,7 @@ var Graph = (function() {
 				this.xMax = Math.max.apply(Math, x);
 				this.xMin = Math.min.apply(Math, x);
 				// x is an array: plot x.length bars, each centered in x[i]
-				
+
 			} else if (typeof x == "number") {
 				// x is a number: create x bars
 				this.xMax = Math.max.apply(Math, y);
@@ -595,12 +593,10 @@ var Graph = (function() {
 
 			this.yMax = Math.max.apply(Math, frec);
 			this.yMin = Math.min.apply(Math, frec);
-			//this.xMax = Math.max.apply(Math, bins);
-			//this.xMin = Math.min.apply(Math, bins);
-			
+
 			this.drawYAxisNumbers( this.yMin > 0 ? 0 : this.yMin, this.yMax);
 			this.drawXAxisNumbers(this.xMin, this.xMax);
-			
+
 			this.drawYGrid();
 
 			this.context.save();
@@ -662,13 +658,7 @@ var Graph = (function() {
 
 			var px = 0,
 				py = 0;
-			
-				/* Start and end points of the graph area 
-				this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
-				this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
-				this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
-				this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
-				*/
+
 			this.context.save();
 
 			switch (this.GRAPH.drawYAxis) {
@@ -1041,13 +1031,9 @@ var Graph = (function() {
 		},
 
 		drawPolarAxis : function() {
-			
+
 			var alpha = 0,
 				beta = Math.atan2(this.yEnd-this.yStart,this.xEnd-this.xStart),
-				h, 
-				k, 
-				drawLine = 0, 
-				drawed = 0,
 				text = "";
 
 			var px, py, rad, npx, npy;
@@ -1063,7 +1049,7 @@ var Graph = (function() {
 				rad = this.GRAPH.polarAxisMargin*Math.min(
 					(this.xEnd-this.xStart)/2, 
 					(this.yEnd-this.yStart)/2);
-				
+
 				this.context.beginPath();
 				this.context.arc(0, 0, rad, 0, Math.PI*2, false);
 
@@ -1074,7 +1060,7 @@ var Graph = (function() {
 
 					px = this.xMax;
 					py = this.yMax;
-					
+
 					if (0 <= alpha && alpha < Math.PI/4) {
 						px *= (this.xEnd-this.xStart)/(this.xMax-this.xMin);
 						py *= Math.tan(alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
@@ -1303,7 +1289,7 @@ var Graph = (function() {
 
 			if (this.yEnd-this.yStart < labels.length*8) {
 				// Labels doesn't fit!
-				// This 8/250 constant has been calculated with trial and error
+				// This 10/250 constant has been calculated by trial and error
 				m = Math.floor(labels.length*10/250);
 			}
 
