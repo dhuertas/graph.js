@@ -445,15 +445,19 @@ var Graph = (function() {
 		 * Plot a polar graph 
 		 * @param {array} y (values)
 		 * @param {array} x (bar labels)
+		 * @param {float} rmax (max value for x and y axes)
 		 */
-		polar : function(y, x, xRange, yRange) {
+		polar : function(y, x, rmax) {
+
 			this.set({
 				drawGrid : false,
 				drawPolarGrid : true,
 				drawPolarAxis : true
 			});
-			
-			return this.plot(y, x, xRange, yRange);
+
+			if (typeof rmax == "undefined") rmax = 1;
+
+			return this.plot(y, x, [-rmax, rmax], [-rmax,rmax]);
 		},
 		
 		/* 
@@ -1039,38 +1043,86 @@ var Graph = (function() {
 		drawPolarAxis : function() {
 			
 			var alpha = 0,
-				px = 0, 
-				py = 0, 
-				rad = 0,
+				beta = Math.atan2(this.yEnd-this.yStart,this.xEnd-this.xStart),
+				h, 
+				k, 
+				drawLine = 0, 
+				drawed = 0,
 				text = "";
 
-			rad = Math.min(
-				(this.xEnd-this.xStart)/2, 
-				(this.yEnd-this.yStart)/2);
+			var px, py, rad, npx, npy;
 
 			if (this.GRAPH.drawPolarAxis) {
 
 				this.context.save();
 
 				this.context.translate(
-					this.xStart+(this.xEnd-this.xStart)/2,
+					this.xStart+(this.xEnd-this.xStart)/2, 
 					this.yStart+(this.yEnd-this.yStart)/2);
-					
+
+				rad = this.GRAPH.polarAxisMargin*Math.min(
+					(this.xEnd-this.xStart)/2, 
+					(this.yEnd-this.yStart)/2);
+				
 				this.context.beginPath();
-				this.context.arc(0, 0, this.GRAPH.polarAxisMargin*rad, 0, Math.PI*2, false);
+				this.context.arc(0, 0, rad, 0, Math.PI*2, false);
 
 				this.context.strokeStyle = this.GRAPH.polarAxisColor;
 				this.context.stroke();
 
-				for (var i = 0; i < this.GRAPH.polarGridNumLines; i++) {
+				for (var alpha = 0; alpha < Math.PI*2; alpha += Math.PI*2/this.GRAPH.polarGridNumLines) {
+
+					px = this.xMax;
+					py = this.yMax;
 					
-					alpha = Math.PI*2*i/this.GRAPH.polarGridNumLines;
-					
-					px = Math.cos(alpha);
-					px *= this.GRAPH.polarAxisMargin*rad;
-					py = Math.sin(alpha);
-					py *= this.GRAPH.polarAxisMargin*rad;
-					
+					if (0 <= alpha && alpha < Math.PI/4) {
+						px *= (this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py *= Math.tan(alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+						npx = rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						npy = rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+					} else if (Math.PI/4 <= alpha && alpha <= 3*Math.PI/4) {
+						px *= Math.tan(Math.PI/2-alpha)*(this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py *= -(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+						if (px == 0) {
+							px = 1e-16;
+						}
+						if (alpha < Math.PI/2) {
+							npx = rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+							npy = rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						} else {
+							npx = -rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+							npy = rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						}
+					} else if (3*Math.PI/4 <= alpha && alpha <= 5*Math.PI/4) {
+						px *= -(this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py *= Math.tan(Math.PI-alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+						if (alpha < Math.PI) {
+							npx = -rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+							npy = rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						} else {
+							npx = -rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+							npy = -rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						}
+					} else if (5*Math.PI/4 <= alpha && alpha <= 7*Math.PI/4) {
+						px *= Math.tan(3*Math.PI/2-alpha)*(this.xEnd-this.xStart)/(this.xMax-this.xMin); 
+						py *= (this.yEnd-this.yStart)/(this.yMax-this.yMin);
+						if (px == 0) {
+							px = 1e-16;
+						}
+						if (alpha < Math.PI*3/2) {
+							npx = -rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+							npy = -rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						} else {
+							npx = rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+							npy = -rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						}
+					} else {
+						px *= (this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py *= Math.tan(alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+						npx = rad*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+						npy = -rad*Math.abs(py/px)*Math.sqrt(1/(1+Math.pow((py/px), 2)));
+					}
+
 					if (0 <= alpha && alpha <= Math.PI/2) {
 						this.context.textAlign = "left";
 						this.context.textBaseline = "top";
@@ -1093,7 +1145,8 @@ var Graph = (function() {
 						text = alpha.toFixed(2);
 					}
 					
-					this.context.fillText(text, px, py);
+					this.context.fillText(text, npx, npy);
+
 				}
 
 				this.context.restore();
@@ -1105,8 +1158,8 @@ var Graph = (function() {
 		/*
 		 * Draws a polar grid
 		 */
-		drawPolarGrid : function() {
-
+		drawPolarGrid : function drawPolarGrid() {
+	
 			var alpha = 0,
 				beta = Math.atan2(this.yEnd-this.yStart,this.xEnd-this.xStart),
 				h, 
@@ -1114,60 +1167,53 @@ var Graph = (function() {
 				drawLine = 0, 
 				drawed = 0;
 
+			var px, py;
+
 			if (this.GRAPH.drawPolarGrid) {
 
 				this.context.save();
 
-				this.context.translate(this.xStart+(this.xEnd-this.xStart)/2, this.yStart+(this.yEnd-this.yStart)/2);
+				this.context.translate(
+					this.xStart+(this.xEnd-this.xStart)/2, 
+					this.yStart+(this.yEnd-this.yStart)/2);
 
-				for (var i = 0; i < this.GRAPH.polarGridNumLines; i++) {
+				for (var alpha = 0; alpha <= Math.PI*2; alpha += Math.PI*2/this.GRAPH.polarGridNumLines) {
 
-					alpha = i*Math.PI*2/this.GRAPH.polarGridNumLines;
-
-					if (alpha < beta) {
-						h = (this.xEnd-this.xStart)/2/Math.cos(alpha);
-					} else if (alpha >= beta && alpha < Math.PI-beta) {
-						h = (this.yEnd-this.yStart)/2/Math.cos(Math.PI/2-alpha);
-					} else if (alpha >= Math.PI-beta && alpha < Math.PI+beta) {
-						h = (this.xEnd-this.xStart)/2/Math.abs(Math.cos(alpha));
-					} else if (alpha >= Math.PI+beta && alpha < 2*Math.PI-beta) {
-						h = (this.yEnd-this.yStart)/2/Math.abs(Math.cos(Math.PI/2-alpha));
+					if (0 <= alpha && alpha < Math.PI/4) {
+						px = (this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py = Math.tan(alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+					} else if (Math.PI/4 <= alpha && alpha <= 3*Math.PI/4) {
+						px = Math.tan(Math.PI/2-alpha)*(this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py = -(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+					} else if (3*Math.PI/4 <= alpha && alpha <= 5*Math.PI/4) {
+						px = -(this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py = Math.tan(Math.PI-alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
+					} else if (5*Math.PI/4 <= alpha && alpha <= 7*Math.PI/4) {
+						px = Math.tan(3*Math.PI/2-alpha)*(this.xEnd-this.xStart)/(this.xMax-this.xMin); 
+						py = (this.yEnd-this.yStart)/(this.yMax-this.yMin);
 					} else {
-						h = (this.xEnd-this.xStart)/2/Math.cos(alpha);
+						px = (this.xEnd-this.xStart)/(this.xMax-this.xMin);
+						py = Math.tan(alpha)*(this.yEnd-this.yStart)/(this.yMax-this.yMin);
 					}
 
-					/* Draw a dotted line from the center */
-					k = 0;
-					drawed = 0;
+					px *= this.xMax;
+					py *= this.yMax;
 
-					while (drawed < h) {
-						switch (k%2) {
-							case 0:
-								drawed = (h-drawed < this.GRAPH.polarGridSpaceLength) ? h : drawed+this.GRAPH.polarGridSpaceLength;
-								this.context.moveTo(drawed, -0.5);
-								break;
-							case 1:
-								drawed = (h-drawed < this.GRAPH.polarGridLineLength) ? h : drawed+this.GRAPH.polarGridLineLength;
-								this.context.lineTo(drawed, -0.5);
-								break;
-						}
-						k++;
-					}
+					this.context.beginPath();
+					this.context.moveTo(0, 0);
+					
+					this.context.lineTo(px, py);
+					this.context.strokeStyle = "#ccc";
+					this.context.stroke();
 
-					this.context.rotate(Math.PI*2/this.GRAPH.polarGridNumLines);
 				}
-
-				this.context.strokeStyle = this.GRAPH.polarGridLineColor;
-				this.context.stroke();
 
 				this.context.restore();
 			}
 
-			this.GRAPH.drawPolarGrid = false;
-
 			return this;
 		},
-		
+
 		/*
 		 * Draws the bottom side x axis numbers
 		 * @param {start} number (the lowest number for the x axis)
