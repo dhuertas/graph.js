@@ -42,12 +42,14 @@ var PI = Math.PI,
 var graph = new Graph({
     appendTo : "container",
     canvasWidth : 800,
-    canvasHeight : 800,
+    canvasHeight : 800/Math.sqrt(2),
+    barPosition : "center",
     title : "Half-wave Dipole Antenna Radiation",
     yAxisTitle : "y",
     xAxisTitle : "x",
-    polarAxisNumFormat : "rad"
-}); 
+    polarAxisNumFormat : "deg",
+    polarGridNumLines : 24
+});
 
 var px = [],
     py = [];
@@ -60,7 +62,7 @@ for (var theta = 0; theta <= 2*PI; theta += 0.01) {
     py.push(r*sin(theta));
 }
 
-graph.polar(py, px, [-1,1], [-1,1]);</pre>
+graph.polar(py, px);</pre>
 		</div>
 	
 		<script type="text/javascript" charset="utf-8">
@@ -72,13 +74,14 @@ graph.polar(py, px, [-1,1], [-1,1]);</pre>
 			var graph = new Graph({
 				appendTo : "container",
 				canvasWidth : 800,
-				canvasHeight : 800,
+				canvasHeight : 800/Math.sqrt(2),
 				barPosition : "center",
 				title : "Half-wave Dipole Antenna Radiation",
 				yAxisTitle : "y",
 				xAxisTitle : "x",
-				polarAxisNumFormat : "rad"
-			}); 
+				polarAxisNumFormat : "deg",
+				polarGridNumLines : 24
+			});
 
 			var px = [],
 				py = [];
@@ -90,7 +93,7 @@ graph.polar(py, px, [-1,1], [-1,1]);</pre>
 				py.push(r*sin(theta));
 			}
 
-			graph.polar(py, px, [-1,1], [-1,1]);
+			graph.polar(py, px);
 		</script>
 	</body>
 </html>
