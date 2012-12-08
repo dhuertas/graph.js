@@ -344,7 +344,7 @@ var Graph = (function() {
 		 * @param {array} yRange (optional: start and end values for y [start, end])
 		 * @return {object} this
 		 */
-		plotPoints : function(y, x, xRange, yRange) {
+		points : function(y, x, xRange, yRange) {
 
 			var px = 0, py = 0;
 
