@@ -191,6 +191,7 @@ var Graph = (function() {
 			div.style.border = "1px solid #ccc";
 			div.style.fontSize = this.GRAPH.fontSize+"px";
 			div.style.padding = "5px";
+			div.style.boxShadow = "1px 1px 3px #ccc";
 			
 			document.getElementsByTagName("body")[0].appendChild(div);
 				
