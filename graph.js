@@ -206,10 +206,10 @@ var Graph = (function() {
 					div.style.left = (e.pageX+20)+"px";
 					
 					div.innerHTML = ""+
-						"x: "+p[0].toFixed(self.GRAPH.xAxisNumDecimals)+" "+
-						"y: "+p[1].toFixed(self.GRAPH.yAxisNumDecimals)+"<br/>"+" "+
-						"r: "+p[2].toFixed(2)+" "+
-						"t: "+p[3].toFixed(2)+"º";
+						"x: "+p[0].toFixed(4)+" "+
+						"y: "+p[1].toFixed(4)+"<br/>"+
+						"r: "+p[2].toFixed(4)+" "+
+						"t: "+p[3].toFixed(4)+"º";
 			}, false);
 			
 			this.canvas.addEventListener('mouseout', function(e) {
