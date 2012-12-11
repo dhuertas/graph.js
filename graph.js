@@ -44,6 +44,8 @@ var Graph = (function() {
 
 			bgColor : "#FFF",
 
+			showValues : true, // show a small div following the cursor with the values
+
 			drawTitle : true,
 			drawYAxis : 3, // 0: none, 1: left, 2: right, 3: both
 			drawYAxisNumbers : true,
@@ -79,7 +81,9 @@ var Graph = (function() {
 			yAxisNumDecimals : 2,
 			yAxisMarkLength : 3, // Mark length in pixels
 			yAxisTitle : "",
-
+			yAxisScale : "lin", // options are: "lin", "log"
+			yAxisLogBase : 10,
+			
 			xAxisTopMargin : 0.9285714286, // 92.86 % height (15 mm from bottom)
 			xAxisBottomMargin : 0.9285714286, // 92.86 % height (15 mm from top)
 			xAxisLineWidth : 1,
@@ -90,6 +94,8 @@ var Graph = (function() {
 			xAxisNumDecimals : 2,
 			xAxisMarkLength : 3, // Mark length in pixels
 			xAxisTitle : "",
+			xAxisScale : "lin", // options are: "lin", "log"
+			xAxisLogBase : 10,
 
 			yGridNumLines : 6,
 			yGridLineLength : 1,
@@ -107,9 +113,7 @@ var Graph = (function() {
 			polarGridColor : "#999",
 			polarAxisColor : "#222",
 			polarAxisMargin : 0.75, // Margin to the closest axis
-			polarAxisNumFormat : "deg", // options are: "deg" for degree, "rad" for radian
-			
-			showValues : true // show a small div following the cursor with the values
+			polarAxisNumFormat : "deg" // options are: "deg" for degree, "rad" for radian
 		};
 
 		/* min and max values */
@@ -240,20 +244,56 @@ var Graph = (function() {
 
 			if (this.numberOfGraphs == 0) {
 				/* Max and Min values for each axis */
-				this.xMax = Math.max.apply(Math, x);
-				this.xMin = Math.min.apply(Math, x);
-				this.yMax = Math.max.apply(Math, y);
-				this.yMin = Math.min.apply(Math, y);
+				
 
-				if (xRange instanceof Array) {
-					this.xMin = xRange[0];
-					this.xMax = xRange[1];
+				switch (this.GRAPH.yAxisScale) {	
+					case 'log':
+					case 'logarithm':
+						this.yMax = Math.log(Math.max.apply(Math, y))/Math.log(this.GRAPH.yAxisLogBase);
+						this.yMin = Math.log(Math.min.apply(Math, y))/Math.log(this.GRAPH.yAxisLogBase);
+
+						if (yRange instanceof Array) {
+							this.yMin = Math.log(yRange[0])/Math.log(this.GRAPH.yAxisLogBase);
+							this.yMax = Math.log(yRange[1])/Math.log(this.GRAPH.yAxisLogBase);
+						}
+						break;
+					case 'lin':
+					case 'linear':
+					default:
+						this.yMax = Math.max.apply(Math, y);
+						this.yMin = Math.min.apply(Math, y);
+
+						if (yRange instanceof Array) {
+							this.yMin = yRange[0];
+							this.yMax = yRange[1];
+						}
+						break;
 				}
 
-				if (yRange instanceof Array) {
-					this.yMin = yRange[0];
-					this.yMax = yRange[1];
+				switch (this.GRAPH.xAxisScale) {
+					case 'log':
+					case 'logarithm':
+						this.xMax = Math.log(Math.max.apply(Math, x))/Math.log(this.GRAPH.xAxisLogBase);
+						this.xMin = Math.log(Math.min.apply(Math, x))/Math.log(this.GRAPH.xAxisLogBase);
+
+						if (xRange instanceof Array) {
+							this.xMin = Math.log(xRange[0])/Math.log(this.GRAPH.xAxisLogBase);
+							this.xMax = Math.log(xRange[1])/Math.log(this.GRAPH.xAxisLogBase);
+						}
+						break;
+					case 'lin':
+					case 'linear':
+					default:
+						this.xMax = Math.max.apply(Math, x);
+						this.xMin = Math.min.apply(Math, x);
+
+						if (xRange instanceof Array) {
+							this.xMin = xRange[0];
+							this.xMax = xRange[1];
+						}
+						break;
 				}
+
 			} else {
 				if (xRange instanceof Array) {
 					xRange[0] = xRange[0] < this.xMin ? this.xMin : xRange[0];
@@ -291,9 +331,39 @@ var Graph = (function() {
 
 			for (var i = 0, len = y.length; i < len; i++) {
 
-				if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
-					px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
-					py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
+				if (xRange[0] <= (this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) && 
+					(this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
+					yRange[0] <= (this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) && 
+					(this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
+					
+					switch (this.GRAPH.yAxisScale) {	
+						case 'log':
+						case 'logarithm':
+							py = (this.yEnd-this.yStart)*
+								(1-(Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase)-this.yMin)/
+								(this.yMax-this.yMin));
+							break;
+						case 'lin':
+						case 'linear':
+						default:
+							py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
+							break;
+					}
+					
+					switch (this.GRAPH.xAxisScale) {
+						case 'log':
+						case 'logarithm':
+							px = (this.xEnd-this.xStart)*
+								(Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase)-this.xMin)/
+								(this.xMax-this.xMin);
+							break;
+						case 'lin':
+						case 'linear':
+						default:
+							px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
+							break;
+					}
+
 					if (drawLine > 0) {
 						this.context.lineTo(px, py);
 					} else {
@@ -309,10 +379,41 @@ var Graph = (function() {
 			this.context.stroke();
 			
 			if (this.GRAPH.lineShowPoints) {
+
 				for (var i = 0, len = y.length; i < len; i++) {
-					if (xRange[0] <= x[i] && x[i] <= xRange[1] && yRange[0] <= y[i] && y[i] <= yRange[1]) {
-						px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
-						py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
+					if (xRange[0] <= (this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) && 
+						(this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
+						yRange[0] <= (this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) && 
+						(this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
+					
+						switch (this.GRAPH.yAxisScale) {
+							case 'log':
+							case 'logarithm':
+								py = (this.yEnd-this.yStart)*
+									(1-(Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase)-this.yMin)/
+									(this.yMax-this.yMin));
+								break;
+							case 'lin':
+							case 'linear':
+							default:
+								py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
+								break;
+						}
+						
+						switch (this.GRAPH.xAxisScale) {
+							case 'log':
+							case 'logarithm':
+								px = (this.xEnd-this.xStart)*
+									(Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase)-this.xMin)/
+									(this.xMax-this.xMin);
+								break;
+							case 'lin':
+							case 'linear':
+								px = (this.xEnd-this.xStart)*(x[i]-this.xMin)/(this.xMax-this.xMin);
+							default:
+								break;
+						}
+						
 						this.context.beginPath();
 						this.context.arc(px, py, this.GRAPH.pointRadius, 0, Math.PI*2, false);
 
@@ -970,33 +1071,83 @@ var Graph = (function() {
 				this.context.translate(this.xStart, this.yStart);
 
 				this.context.beginPath();
+				
+				switch (this.GRAPH.yAxisScale) {
+					case 'log':
+					case 'logarithmic':
 
-				for (var i = 1; i <= this.GRAPH.yGridNumLines-1; i++) {
+						var a = Math.floor(this.yMin),
+							b = Math.pow(this.GRAPH.yAxisLogBase, a),
+							c = Math.pow(this.GRAPH.yAxisLogBase, this.yMax),
+							num, i = 1;
 
-					yPos = Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yGridNumLines);
-					drawed = 0;
-					this.context.moveTo(this.xStart, yPos);
-					k = 0;
+						while (b < c) {
+							b = i*Math.pow(this.GRAPH.yAxisLogBase, a);
+							num = Math.log(b)/Math.log(this.GRAPH.yAxisLogBase);
 
-					while (drawed < (this.xEnd-this.xStart)) {
-						/* Move from left to right */
-						switch (k%2) {
-							case 0:
-								drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridSpaceLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridSpaceLength;
-								this.context.moveTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
-								break;
-							case 1:
-								drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridLineLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridLineLength;
-								this.context.lineTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
-								break;
+							yPos = Math.floor((this.yEnd-this.yStart)*(1-(num-this.yMin)/(this.yMax-this.yMin)));
+
+							if (yPos <= this.yEnd-this.yStart) {
+
+								drawed = 0;
+								this.context.moveTo(this.xStart, yPos);
+								k = 0;
+
+								while (drawed < (this.xEnd-this.xStart)) {
+									/* Move from left to right */
+									switch (k%2) {
+										case 0:
+											drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridSpaceLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridSpaceLength;
+											this.context.moveTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
+											break;
+										case 1:
+											drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridLineLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridLineLength;
+											this.context.lineTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
+											break;
+									}
+									k++;
+								}
+							}
+
+							if (i%this.GRAPH.yAxisLogBase == 0) {
+								a++;
+								i = 1;
+							} else {
+								i++
+							}
 						}
-						k++;
-					}
+
+						break;
+					case 'lin':
+					case 'linear':
+					default:
+						for (var i = 1; i <= this.GRAPH.yGridNumLines-1; i++) {
+
+							yPos = Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yGridNumLines);
+							drawed = 0;
+							this.context.moveTo(this.xStart, yPos);
+							k = 0;
+
+							while (drawed < (this.xEnd-this.xStart)) {
+								/* Move from left to right */
+								switch (k%2) {
+									case 0:
+										drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridSpaceLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridSpaceLength;
+										this.context.moveTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
+										break;
+									case 1:
+										drawed = ((this.xEnd-this.xStart)-drawed < this.GRAPH.xGridLineLength) ? (this.xEnd-this.xStart) : drawed+this.GRAPH.xGridLineLength;
+										this.context.lineTo((this.xEnd-this.xStart)-drawed, yPos+0.5);
+										break;
+								}
+								k++;
+							}
+						}
+						break;
 				}
 
 				this.context.strokeStyle = this.GRAPH.yGridLineColor;
 				this.context.stroke();
-
 				this.context.restore();
 			}
 
@@ -1020,31 +1171,82 @@ var Graph = (function() {
 
 				this.context.beginPath();
 				
-				for (var i = 1; i <= this.GRAPH.xGridNumLines-1; i++) {
+				switch (this.GRAPH.xAxisScale) {
+					case 'log':
+					case 'logarithmic':
+						var a = Math.floor(this.xMin),
+							b = Math.pow(this.GRAPH.xAxisLogBase, a),
+							c = Math.pow(this.GRAPH.xAxisLogBase, this.xMax),
+							num, i = 1;
 
-					xPos = Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xGridNumLines);
-					drawed = 0;
-					this.context.moveTo(xPos, (this.yEnd-this.yStart));
-					k = 0;
-					while (drawed < (this.yEnd-this.yStart)) {
-						/* Move from bottom to top */
-						switch (k%2) {
-							case 0:
-								drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
-								this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
-								break;
-							case 1:
-								drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
-								this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
-								break;
+						while (b < c) {
+							b = i*Math.pow(this.GRAPH.xAxisLogBase, a);
+							num = Math.log(b)/Math.log(this.GRAPH.xAxisLogBase);
+
+							xPos = Math.floor((this.xEnd-this.xStart)*(num-this.xMin)/(this.xMax-this.xMin));
+
+							if (this.xMin <= num && num <= this.xMax) {
+
+								drawed = 0;
+								this.context.moveTo(xPos, (this.yEnd-this.yStart));
+								k = 0;
+
+								while (drawed < (this.yEnd-this.yStart)) {
+									/* Move from bottom to top */
+									switch (k%2) {
+										case 0:
+											drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
+											this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+											break;
+										case 1:
+											drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
+											this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+											break;
+									}
+									k++;
+								}
+								
+							}
+
+							if (i%this.GRAPH.xAxisLogBase == 0) {
+								a++;
+								i = 1;
+							} else {
+								i++
+							}
 						}
-						k++;
-					}
-				}
 
+						break;
+					case 'lin':
+					case 'linear':
+					default:
+						for (var i = 1; i <= this.GRAPH.xGridNumLines-1; i++) {
+
+							xPos = Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xGridNumLines);
+							drawed = 0;
+							this.context.moveTo(xPos, (this.yEnd-this.yStart));
+							k = 0;
+							
+							while (drawed < (this.yEnd-this.yStart)) {
+								/* Move from bottom to top */
+								switch (k%2) {
+									case 0:
+										drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
+										this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+										break;
+									case 1:
+										drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
+										this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+										break;
+								}
+							k++;
+							}
+						}
+						break;
+				}
+				
 				this.context.strokeStyle = this.GRAPH.xGridLineColor;
 				this.context.stroke();
-				
 				this.context.restore();
 			}
 
@@ -1248,6 +1450,8 @@ var Graph = (function() {
 		 */
 		drawXAxisNumbers : function(start, end) {
 
+			var number;
+
 			if (this.GRAPH.drawXAxisNumbers) {
 				this.context.save();
 
@@ -1255,12 +1459,30 @@ var Graph = (function() {
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 				this.context.textAlign = this.GRAPH.xAxisTextAlign;
 
-				for (var i = 0; i <= this.GRAPH.xAxisNumSteps; i++) {
-					this.context.fillText(
-						(start+i*(end-start)/this.GRAPH.xAxisNumSteps)
-							.toFixed(this.GRAPH.xAxisNumDecimals), 
-						this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps, 
-						this.yEnd+3 /* 3px top margin from axis */);
+				switch (this.GRAPH.xAxisScale) {
+					case 'log':
+					case 'logarithm':
+						for (var i = 0; i <= this.GRAPH.xAxisNumSteps; i++) {
+							number = Math.pow(this.GRAPH.xAxisLogBase, (start+i*(end-start)/this.GRAPH.xAxisNumSteps)
+									.toFixed(this.GRAPH.xAxisNumDecimals));
+
+							this.context.fillText(number.toPrecision(4), 
+								this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps, 
+								this.yEnd+3 /* 3px top margin from axis */);
+						}
+						break;
+					case 'lin':
+					case 'linear':
+					default:
+						for (var i = 0; i <= this.GRAPH.xAxisNumSteps; i++) {
+							number = (start+i*(end-start)/this.GRAPH.xAxisNumSteps)
+									.toFixed(this.GRAPH.xAxisNumDecimals);
+
+							this.context.fillText(number, 
+								this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps, 
+								this.yEnd+3 /* 3px top margin from axis */);
+						}
+						break;
 				}
 
 				this.context.restore();
@@ -1280,19 +1502,39 @@ var Graph = (function() {
 		 */
 		drawYAxisNumbers : function(start, end) {
 
+			var number;
+
 			if (this.GRAPH.drawYAxisNumbers) {
 				this.context.save();
 
 				this.context.textBaseline = this.GRAPH.yAxisTextBaseline;
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 				this.context.textAlign = this.GRAPH.yAxisTextAlign;
+				
+				switch (this.GRAPH.yAxisScale) {
+					case 'log':
+					case 'logarithm':
+						for (var i = 0; i <= this.GRAPH.yAxisNumSteps; i++) {
+							number = Math.pow(this.GRAPH.yAxisLogBase, (end-i*(end-start)/this.GRAPH.yAxisNumSteps)
+									.toFixed(this.GRAPH.yAxisNumDecimals));
 
-				for (var i = 0; i <= this.GRAPH.yAxisNumSteps; i++) {
-					this.context.fillText(
-						(end-i*(end-start)/this.GRAPH.yAxisNumSteps)
-							.toFixed(this.GRAPH.yAxisNumDecimals), 
-						this.xStart-5 /* 3px right margin from axis */, 
-						this.yStart+i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
+							this.context.fillText(number.toPrecision(4), 
+								this.xStart-5 /* 3px right margin from axis */, 
+								this.yStart+i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
+						}
+						break;
+					case 'lin':
+					case 'linear':
+					default:
+						for (var i = 0; i <= this.GRAPH.yAxisNumSteps; i++) {
+							number = (end-i*(end-start)/this.GRAPH.yAxisNumSteps)
+									.toFixed(this.GRAPH.yAxisNumDecimals);
+
+							this.context.fillText(number, 
+								this.xStart-5 /* 3px right margin from axis */, 
+								this.yStart+i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
+						}
+						break;
 				}
 
 				this.context.restore();
@@ -1423,7 +1665,7 @@ var Graph = (function() {
 				this.context.textAlign = "center";
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 
-				px = this.GRAPH.yAxisLeftMargin*this.canvas.width/2;
+				px = this.GRAPH.yAxisLeftMargin*this.canvas.width/3;
 				py = this.yStart+(this.yEnd-this.yStart)/2;
 
 				this.context.translate(px, py);
@@ -1474,6 +1716,11 @@ var Graph = (function() {
 			this.GRAPH.drawXAxisNumbers = true;
 			this.GRAPH.drawGrid = true;
 
+			this.yMax = 0;
+			this.yMin = 0;
+			this.xMax = 0;
+			this.xMin = 0;
+
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 			return this;
@@ -1489,16 +1736,41 @@ var Graph = (function() {
 		},
 		
 		getCoordinates : function(x, y) {
-			var yOffset = 3, 
-				xOffset = 0;
+			var yOffset = 0, 
+				xOffset = 0,
+				px, py, r , t;
 			
 			x -= xOffset;
 			y -= yOffset;
 			
-			var px = this.xMin+(this.xMax-this.xMin)*(x-this.xStart)/(this.xEnd-this.xStart), 
-				py = this.yMin+(this.yMax-this.yMin)*(y-this.yEnd)/(this.yStart-this.yEnd), 
-				r = Math.sqrt(Math.pow(px, 2)+Math.pow(py, 2)), 
-				t = Math.atan2(py, px)*180/Math.PI;
+			switch (this.GRAPH.yAxisScale) {
+				case 'log':
+				case 'logarithm':
+					py = Math.pow(this.GRAPH.yAxisLogBase, 
+						this.yMin+(this.yMax-this.yMin)*(y-this.yEnd)/(this.yStart-this.yEnd));
+					break;
+				case 'lin':
+				case 'linear':
+				default:
+					py = this.yMin+(this.yMax-this.yMin)*(y-this.yEnd)/(this.yStart-this.yEnd);
+					break;
+			}
+			
+			switch (this.GRAPH.xAxisScale) {
+				case 'log':
+				case 'logarithm':
+					px = Math.pow(this.GRAPH.xAxisLogBase,
+						this.xMin+(this.xMax-this.xMin)*(x-this.xStart)/(this.xEnd-this.xStart));
+					break;
+				case 'lin':
+				case 'linear':
+				default:
+					px = this.xMin+(this.xMax-this.xMin)*(x-this.xStart)/(this.xEnd-this.xStart);
+					break;
+			}
+			
+			r = Math.sqrt(Math.pow(px, 2)+Math.pow(py, 2));
+			t = Math.atan2(py, px)*180/Math.PI;
 			
 			return [px, py, r, t];
 		}
