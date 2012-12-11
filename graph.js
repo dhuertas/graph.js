@@ -107,7 +107,9 @@ var Graph = (function() {
 			polarGridColor : "#999",
 			polarAxisColor : "#222",
 			polarAxisMargin : 0.75, // Margin to the closest axis
-			polarAxisNumFormat : "deg" // options are: "deg" for degree, "rad" for radian
+			polarAxisNumFormat : "deg", // options are: "deg" for degree, "rad" for radian
+			
+			showValues : true // show a small div following the cursor with the values
 		};
 
 		/* min and max values */
@@ -179,6 +181,44 @@ var Graph = (function() {
 		this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
 		this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
 
+		if (this.GRAPH.showValues) {
+			var self = this,
+				div = document.createElement("div");
+				
+			div.setAttribute("id", "values");
+			div.style.position = "absolute";
+			div.style.backgroundColor = "rgba(255,255,255,0.9)";
+			div.style.border = "1px solid #ccc";
+			div.style.fontSize = this.GRAPH.fontSize+"px";
+			div.style.padding = "5px";
+			
+			document.getElementsByTagName("body")[0].appendChild(div);
+				
+			this.canvas.addEventListener('mousemove', function(e) {
+			
+				var rect = self.canvas.getBoundingClientRect(),
+					x = e.clientX-rect.left, 
+					y = e.clientY-rect.top,
+					p = self.getCoordinates(x, y);
+					
+					div.style.top = (e.pageY+10)+"px";
+					div.style.left = (e.pageX+20)+"px";
+					
+					div.innerHTML = ""+
+						"x: "+p[0].toFixed(self.GRAPH.xAxisNumDecimals)+" "+
+						"y: "+p[1].toFixed(self.GRAPH.yAxisNumDecimals)+"<br/>"+" "+
+						"r: "+p[2].toFixed(2)+" "+
+						"t: "+p[3].toFixed(2)+"º";
+			}, false);
+			
+			this.canvas.addEventListener('mouseout', function(e) {
+				div.style.display = "none";
+			}, false);
+			
+			this.canvas.addEventListener('mouseover', function(e) {
+				div.style.display = "block";
+			}, false);
+		}
 	}
 
 	construct.prototype = {
@@ -1124,11 +1164,11 @@ var Graph = (function() {
 					}
 					
 					if (this.GRAPH.polarAxisNumFormat == "deg") {
-						text = (alpha*180/Math.PI).toFixed(0)+" º";
+						text = (360-alpha*180/Math.PI).toFixed(0)+" º";
 					} else if (this.GRAPH.polarAxisNumFormat == "rad") {
-						text = (alpha/Math.PI).toFixed(2)+" 𝜋";
+						text = (2-alpha/Math.PI).toFixed(2)+" 𝜋";
 					} else {
-						text = alpha.toFixed(2);
+						text = (Math.PI*2-alpha).toFixed(2);
 					}
 					
 					this.context.fillText(text, npx, npy);
@@ -1445,6 +1485,21 @@ var Graph = (function() {
 			image.src = this.canvas.toDataURL(mime ? mime : "image/png");
 
 			return image;
+		},
+		
+		getCoordinates : function(x, y) {
+			var yOffset = 3, 
+				xOffset = 0;
+			
+			x -= xOffset;
+			y -= yOffset;
+			
+			var px = this.xMin+(this.xMax-this.xMin)*(x-this.xStart)/(this.xEnd-this.xStart), 
+				py = this.yMin+(this.yMax-this.yMin)*(y-this.yEnd)/(this.yStart-this.yEnd), 
+				r = Math.sqrt(Math.pow(px, 2)+Math.pow(py, 2)), 
+				t = Math.atan2(py, px)*180/Math.PI;
+			
+			return [px, py, r, t];
 		}
 	}
 
@@ -1474,7 +1529,7 @@ var Graph = (function() {
  * |      |           |                            xAxisBottomMargin (%) |           |    |              |
  * |      |           |                                                  |           |    |              |
  * |      |           |                                                  |           |    |              |
- * | yMax |___________V__________________________________________________|___________|    |              |
+ * | yMin |___________V__________________________________________________|___________|    |              |
  * |            xMin                                                     |       xMax     |              |
  * |_____________________________________________________________________V________________|              V
  *
