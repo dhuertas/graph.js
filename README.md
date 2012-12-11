@@ -24,6 +24,7 @@ Where to start? Browse some examples to see how it works:
 - [Polar graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/polar.html)
 - [Bar charts](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/bars.html)
 - [Histogram graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/histogram.html)
+- [Semi-Log graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/response.html)
 - [Export graph to an image](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/image.html)
 
 **Documentation**
