@@ -23,6 +23,10 @@ var Graph = (function() {
 
 	}
 	
+	function log(value, base) {
+		return Math.log(value)/Math.log(base ? base : 10);
+	}
+	
 	function construct(options) {
 
 		this.GRAPH = {
@@ -249,12 +253,16 @@ var Graph = (function() {
 				switch (this.GRAPH.yAxisScale) {	
 					case 'log':
 					case 'logarithm':
-						this.yMax = Math.log(Math.max.apply(Math, y))/Math.log(this.GRAPH.yAxisLogBase);
-						this.yMin = Math.log(Math.min.apply(Math, y))/Math.log(this.GRAPH.yAxisLogBase);
+						this.yMax = log(Math.max.apply(Math, y), this.GRAPH.yAxisLogBase);
+						this.yMin = log(Math.min.apply(Math, y), this.GRAPH.yAxisLogBase);
+						//this.yMax = Math.log(Math.max.apply(Math, y))/Math.log(this.GRAPH.yAxisLogBase);
+						//this.yMin = Math.log(Math.min.apply(Math, y))/Math.log(this.GRAPH.yAxisLogBase);
 
 						if (yRange instanceof Array) {
-							this.yMin = Math.log(yRange[0])/Math.log(this.GRAPH.yAxisLogBase);
-							this.yMax = Math.log(yRange[1])/Math.log(this.GRAPH.yAxisLogBase);
+							this.yMin = log(yRange[0], this.GRAPH.yAxisLogBase);
+							this.yMax = log(yRange[1], this.GRAPH.yAxisLogBase);
+							//this.yMin = Math.log(yRange[0])/Math.log(this.GRAPH.yAxisLogBase);
+							//this.yMax = Math.log(yRange[1])/Math.log(this.GRAPH.yAxisLogBase);
 						}
 						break;
 					case 'lin':
@@ -273,12 +281,12 @@ var Graph = (function() {
 				switch (this.GRAPH.xAxisScale) {
 					case 'log':
 					case 'logarithm':
-						this.xMax = Math.log(Math.max.apply(Math, x))/Math.log(this.GRAPH.xAxisLogBase);
-						this.xMin = Math.log(Math.min.apply(Math, x))/Math.log(this.GRAPH.xAxisLogBase);
+						this.xMax = log(Math.max.apply(Math, x), this.GRAPH.xAxisLogBase);
+						this.xMin = log(Math.min.apply(Math, x), this.GRAPH.xAxisLogBase);
 
 						if (xRange instanceof Array) {
-							this.xMin = Math.log(xRange[0])/Math.log(this.GRAPH.xAxisLogBase);
-							this.xMax = Math.log(xRange[1])/Math.log(this.GRAPH.xAxisLogBase);
+							this.xMin = log(xRange[0], this.GRAPH.xAxisLogBase);
+							this.xMax = log(xRange[1], this.GRAPH.xAxisLogBase);
 						}
 						break;
 					case 'lin':
@@ -331,16 +339,16 @@ var Graph = (function() {
 
 			for (var i = 0, len = y.length; i < len; i++) {
 
-				if (xRange[0] <= (this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) && 
-					(this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
-					yRange[0] <= (this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) && 
-					(this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
-					
+				if (xRange[0] <= (this.GRAPH.xAxisScale == "log" ? log(x[i], this.GRAPH.xAxisLogBase) : x[i]) && 
+					(this.GRAPH.xAxisScale == "log" ? log(x[i], this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
+					yRange[0] <= (this.GRAPH.yAxisScale == "log" ? log(y[i], this.GRAPH.yAxisLogBase) : y[i]) && 
+					(this.GRAPH.yAxisScale == "log" ? log(y[i], this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
+
 					switch (this.GRAPH.yAxisScale) {	
 						case 'log':
 						case 'logarithm':
 							py = (this.yEnd-this.yStart)*
-								(1-(Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase)-this.yMin)/
+								(1-(log(y[i], this.GRAPH.yAxisLogBase)-this.yMin)/
 								(this.yMax-this.yMin));
 							break;
 						case 'lin':
@@ -354,7 +362,7 @@ var Graph = (function() {
 						case 'log':
 						case 'logarithm':
 							px = (this.xEnd-this.xStart)*
-								(Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase)-this.xMin)/
+								(log(x[i], this.GRAPH.xAxisLogBase)-this.xMin)/
 								(this.xMax-this.xMin);
 							break;
 						case 'lin':
@@ -381,16 +389,16 @@ var Graph = (function() {
 			if (this.GRAPH.lineShowPoints) {
 
 				for (var i = 0, len = y.length; i < len; i++) {
-					if (xRange[0] <= (this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) && 
-						(this.GRAPH.xAxisScale == "log" ? Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
-						yRange[0] <= (this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) && 
-						(this.GRAPH.yAxisScale == "log" ? Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
+					if (xRange[0] <= (this.GRAPH.xAxisScale == "log" ? log(x[i], this.GRAPH.xAxisLogBase) : x[i]) && 
+						(this.GRAPH.xAxisScale == "log" ? log(x[i], this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
+						yRange[0] <= (this.GRAPH.yAxisScale == "log" ? log(y[i], this.GRAPH.yAxisLogBase) : y[i]) && 
+						(this.GRAPH.yAxisScale == "log" ? log(y[i], this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
 					
 						switch (this.GRAPH.yAxisScale) {
 							case 'log':
 							case 'logarithm':
 								py = (this.yEnd-this.yStart)*
-									(1-(Math.log(y[i])/Math.log(this.GRAPH.yAxisLogBase)-this.yMin)/
+									(1-(log(y[i], this.GRAPH.yAxisLogBase)-this.yMin)/
 									(this.yMax-this.yMin));
 								break;
 							case 'lin':
@@ -404,7 +412,7 @@ var Graph = (function() {
 							case 'log':
 							case 'logarithm':
 								px = (this.xEnd-this.xStart)*
-									(Math.log(x[i])/Math.log(this.GRAPH.xAxisLogBase)-this.xMin)/
+									(log(x[i], this.GRAPH.xAxisLogBase)-this.xMin)/
 									(this.xMax-this.xMin);
 								break;
 							case 'lin':
@@ -1083,7 +1091,7 @@ var Graph = (function() {
 
 						while (b < c) {
 							b = i*Math.pow(this.GRAPH.yAxisLogBase, a);
-							num = Math.log(b)/Math.log(this.GRAPH.yAxisLogBase);
+							num = log(b, this.GRAPH.yAxisLogBase);
 
 							yPos = Math.floor((this.yEnd-this.yStart)*(1-(num-this.yMin)/(this.yMax-this.yMin)));
 
@@ -1181,7 +1189,7 @@ var Graph = (function() {
 
 						while (b < c) {
 							b = i*Math.pow(this.GRAPH.xAxisLogBase, a);
-							num = Math.log(b)/Math.log(this.GRAPH.xAxisLogBase);
+							num = log(b, this.GRAPH.xAxisLogBase);
 
 							xPos = Math.floor((this.xEnd-this.xStart)*(num-this.xMin)/(this.xMax-this.xMin));
 
@@ -1808,13 +1816,3 @@ var Graph = (function() {
  *
  * <------------------------------------ canvas width ------------------------------------>
  */
-		
-/* Bezier curves */
-// context.beginPath();
-// context.quadraticCurveTo();
-// context.moveTo(50, 150);
-// context.quadraticCurveTo(250, 50, 450 /* end point x */, 150 /* end point y */);
-		
-// context.quadraticCurveTo(cp1x, cp1y, x /* end point x */, y /* end point y */);
-// context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x /* end point x */, y /* end point y */);
-// context.stroke();
