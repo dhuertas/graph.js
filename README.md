@@ -26,6 +26,7 @@ Where to start? Browse some examples to see how it works:
 - [Histogram graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/histogram.html)
 - [Semi-Log graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/response.html)
 - [Export graph to an image](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/image.html)
+- [Realtime graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/realtime.html)
 
 **Documentation**
 
