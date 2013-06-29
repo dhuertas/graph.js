@@ -248,7 +248,6 @@ var Graph = (function() {
 
 			if (this.numberOfGraphs == 0) {
 				/* Max and Min values for each axis */
-				
 
 				switch (this.GRAPH.yAxisScale) {	
 					case 'log':
@@ -1720,16 +1719,49 @@ var Graph = (function() {
 
 			this.GRAPH.colorIndex = 0;
 			this.GRAPH.pointColorIndex = 0;
+			this.GRAPH.drawYAxis = 3;
 			this.GRAPH.drawYAxisNumbers = true;
+			this.GRAPH.drawXAxis = 3;
 			this.GRAPH.drawXAxisNumbers = true;
 			this.GRAPH.drawGrid = true;
+			this.GRAPH.drawTitle = true;
 
 			this.yMax = 0;
 			this.yMin = 0;
 			this.xMax = 0;
 			this.xMin = 0;
 
+			if (options instanceof Object) {
+				for (var elem in options) {
+					if (this.GRAPH[elem] != null) {
+						
+						if (elem == "canvasWidth") {
+							this.canvas.setAttribute("width", options[elem]);
+						}
+						
+						if (elem == "canvasHeight") {
+							this.canvas.setAttribute("height", options[elem]);
+						}
+						
+						this.GRAPH[elem] = options[elem];
+						
+					}
+				}
+			}
+
+			/* Start and end points of the graph area */
+			this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
+			this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
+			this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
+			this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
+			
+			this.numberOfGraphs = 0;
+
+			this.context.save();
+			
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+			this.context.restore();
 
 			return this;
 		},
