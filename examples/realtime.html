@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Graph.js - Realtime graphs</title>
+		<script src="../graph.js" type="text/javascript"></script>
+	</head>
+	<style>
+		body {width: 100%;
+			margin: 0;
+			padding: 0;
+			
+			font-family: "Helvetica Neue";
+			color: #333;
+		}
+
+		#container {
+			width: 800px;
+			margin: 50px auto;
+			font-size: 12px;
+		}
+		
+		pre {
+			width: 778px;
+			color: #333;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 3px;
+		}
+	</style>
+	<body>
+		<div id="container">
+			<h1>Realtime graphs</h1>
+			<p>The example below plots the spectrum of a random generated 64-QAM modulation:</p>
+			<div id="spectrum"></div>
+			<h2>Example code</h2>
+			<pre>var options 		= {
+	appendTo 			: "spectrum",
+	canvasWidth 		: 800,
+	canvasHeight 		: 800/Math.sqrt(2),
+	drawYAxis			: 3,
+	drawYAxisNumbers	: true,
+	drawXAxis			: 3,
+	drawXAxisNumbers	: true,
+	drawGrid 			: true,
+	showValues			: false,
+
+	drawTitle			: true,
+	title				: "64-QAM spectrum (sampling rate: 16kHz, center frequency: 4kHz, symbol time: 1ms, no window)",
+	drawXAxisTitle		: true,
+	xAxisTitle 			: "Discrete frequency (f)"
+};
+
+var graph 			= new Graph(options);
+
+var N 				= 1024,				// Buffer length
+	buffer 			= new Array(N);
+
+var freq 			= 4000,				// Analog signal frequency
+	Ts				= 0.001;			// Symbol time
+
+var sr				= 16000;			// Sample rate
+
+var updateInterval	= 0.025;			// In seconds
+
+var Sx 				= [], 				// Spectrum x axis points
+	x 				= new Array(512),	// Buffer x axis points
+	Sy 				= new Array(512),	// Spectrum y axis points
+	F;									// Stores the resulting FFT
+
+for (var j = 0; j < N; j++) {
+	buffer[j] = 0;
+	x[j] = j;
+	Sx[j] = j/N;
+}
+
+function getSymbol (n) {
+
+	var i = Math.random(), 
+		q = Math.random();
+
+	if (n == 2) {
+
+		i = (i < 0.5) ? -(1/2) : 1/2;
+		q = (q < 0.5) ? -(1/2) : 1/2;
+
+	} else if (n == 4) {
+
+		if (0 <= i && i < 0.25) 		i = -(3/2);
+		else if (0.25 <= i && i < 0.5) 	i = -(1/2);
+		else if (0.5 <= i && i < 0.75) 	i = 1/2;
+		else 							i = 3/2;
+
+		if (0 <= q && q < 0.25) 		q = -(3/2);
+		else if (0.25 <= q && q < 0.5) 	q = -(1/2);
+		else if (0.5 <= q && q < 0.75) 	q = 1/2;
+		else 							q = 3/2;
+
+	} else if (n == 8) {
+
+		if (0 <= i && i < 0.125)			i = -(7/2);
+		else if (0.125 <= i && i < 0.25)	i = -(5/2);
+		else if (0.25 <= i && i < 0.375)	i = -(3/2);
+		else if (0.375 <= i && i < 0.5)		i = -(1/2);
+		else if (0.5 <= i && i < 0.625)		i = 1/2;
+		else if (0.625 <= i && i < 0.75)	i = 3/2;
+		else if (0.75 <= i && i < 0.875)	i = 5/2;
+		else 								i = 7/2;
+
+		if (0 <= q && q < 0.125)			q = -(7/2);
+		else if (0.125 <= q && q < 0.25)	q = -(5/2);
+		else if (0.25 <= q && q < 0.375)	q = -(3/2);
+		else if (0.375 <= q && q < 0.5)		q = -(1/2);
+		else if (0.5 <= q && q < 0.625)		q = 1/2;
+		else if (0.625 <= q && q < 0.75)	q = 3/2;
+		else if (0.75 <= q && q < 0.875)	q = 5/2;
+		else 								q = 7/2;
+
+	} else {
+
+		i = 0; q = 0;
+
+	}
+
+	return [i, q];
+
+}
+
+function qam(i, q, f, t) {
+
+	return (i*Math.cos(Math.PI*2*f*t) - q*Math.sin(2*Math.PI*f*t));
+
+}
+
+function fft(s) {
+
+	var a = 0;
+	var e = [], E = [];		// even
+	var o = [], O = []; 	// odd
+	var N = s.length;
+
+	var r = new Array(N);	// result
+
+	if (N > 1) {
+		for (var n = 0; n < N; n++) {
+			if (n%2 === 0) {
+				e.push(s[n]);
+			} else {
+				o.push(s[n]);
+			}
+		}
+
+		E = fft(e); O = fft(o);
+
+		for (var k = 0; k < N/2; k++) {
+			a = 2*Math.PI*k/N;
+			/* (E[k][0] + jE[k][1]) + (cos(a) - jsin(a))*(O[k][0] + jO[k][1]) */
+			r[k] = [
+				E[k][0] + (Math.cos(a)*O[k][0] + Math.sin(a)*O[k][1]),
+				E[k][1] + (Math.cos(a)*O[k][1] - Math.sin(a)*O[k][0])];
+			r[k + N/2] = [
+				E[k][0] - (Math.cos(a)*O[k][0] + Math.sin(a)*O[k][1]),
+				E[k][1] - (Math.cos(a)*O[k][1] - Math.sin(a)*O[k][0])];
+		}
+
+	} else {
+		r[0] = [s[0], 0];
+	}
+
+	return r;
+
+}
+
+function loop() {
+
+	var levels = 8,		// number of levels
+		iq; 			// In-phase and Quadrature components
+
+	var symbols = updateInterval/Ts,
+		samplesPerSymbol = Ts*sr;
+
+	for (var j = 0; j < symbols; j++) {
+
+		iq = getSymbol(levels);
+
+		// sample that symbol
+		for (var n = 0; n < samplesPerSymbol; n++) {
+
+			if (buffer.length >= N) {
+				buffer.splice(0, 1);
+			}
+
+			buffer.push(qam(iq[0], iq[1], freq, n/sr));
+
+		}
+
+	}
+
+	F = fft(buffer);
+
+	// Spectrum
+	for (var j = 0; j < F.length; j++) {
+		Sy[j] = 10*Math.log(Math.sqrt(Math.pow(F[j][0], 2) + Math.pow(F[j][1], 2)));
+	}
+
+	// Plot the time serie
+	//graph.clear(options).plot(buffer, x, [256, 511], [-4, 4]);
+
+	// Plot the spectrum
+	graph.clear(options).plot(Sy, Sx, [0,0.5], [0,70]);
+
+	// Constellation
+	//graph.clear(options).points([iq[0]], [iq[1]], [-4, 4], [-4, 4]);
+
+	setTimeout(loop, 1000*updateInterval);
+
+}
+
+loop();</pre>
+		</div>
+		<script type="text/javascript">
+			var options 		= {
+				appendTo 			: "spectrum",
+				canvasWidth 		: 800,
+				canvasHeight 		: 800/Math.sqrt(2),
+				drawYAxis			: 3,
+				drawYAxisNumbers	: true,
+				drawXAxis			: 3,
+				drawXAxisNumbers	: true,
+				drawGrid 			: true,
+				showValues			: false,
+
+				drawTitle			: true,
+				title				: "64-QAM spectrum (sampling rate: 16kHz, center frequency: 4kHz, symbol time: 1ms, no window)",
+				drawXAxisTitle		: true,
+				xAxisTitle 			: "Discrete frequency (f)"
+			};
+
+			var graph 			= new Graph(options);
+			
+			var N 				= 1024,				// Buffer length
+				buffer 			= new Array(N);
+
+			var freq 			= 4000,				// Analog signal frequency
+				Ts				= 0.001;			// Symbol time
+
+			var sr				= 16000;			// Sample rate
+
+			var updateInterval	= 0.025;			// In seconds
+
+			var Sx 				= [], 				// Spectrum x axis points
+				x 				= new Array(512),	// Buffer x axis points
+				Sy 				= new Array(512),	// Spectrum y axis points
+				F;									// Stores the resulting FFT
+
+			for (var j = 0; j < N; j++) {
+				buffer[j] = 0;
+				x[j] = j;
+				Sx[j] = j/N;
+			}
+
+			function getSymbol (n) {
+
+				var i = Math.random(), 
+					q = Math.random();
+
+				if (n == 2) {
+
+					i = (i < 0.5) ? -(1/2) : 1/2;
+					q = (q < 0.5) ? -(1/2) : 1/2;
+
+				} else if (n == 4) {
+
+					if (0 <= i && i < 0.25) 		i = -(3/2);
+					else if (0.25 <= i && i < 0.5) 	i = -(1/2);
+					else if (0.5 <= i && i < 0.75) 	i = 1/2;
+					else 							i = 3/2;
+
+					if (0 <= q && q < 0.25) 		q = -(3/2);
+					else if (0.25 <= q && q < 0.5) 	q = -(1/2);
+					else if (0.5 <= q && q < 0.75) 	q = 1/2;
+					else 							q = 3/2;
+
+				} else if (n == 8) {
+
+					if (0 <= i && i < 0.125)			i = -(7/2);
+					else if (0.125 <= i && i < 0.25)	i = -(5/2);
+					else if (0.25 <= i && i < 0.375)	i = -(3/2);
+					else if (0.375 <= i && i < 0.5)		i = -(1/2);
+					else if (0.5 <= i && i < 0.625)		i = 1/2;
+					else if (0.625 <= i && i < 0.75)	i = 3/2;
+					else if (0.75 <= i && i < 0.875)	i = 5/2;
+					else 								i = 7/2;
+
+					if (0 <= q && q < 0.125)			q = -(7/2);
+					else if (0.125 <= q && q < 0.25)	q = -(5/2);
+					else if (0.25 <= q && q < 0.375)	q = -(3/2);
+					else if (0.375 <= q && q < 0.5)		q = -(1/2);
+					else if (0.5 <= q && q < 0.625)		q = 1/2;
+					else if (0.625 <= q && q < 0.75)	q = 3/2;
+					else if (0.75 <= q && q < 0.875)	q = 5/2;
+					else 								q = 7/2;
+
+				} else {
+
+					i = 0; q = 0;
+
+				}
+
+				return [i, q];
+
+			}
+
+			function qam(i, q, f, t) {
+
+				return (i*Math.cos(Math.PI*2*f*t) - q*Math.sin(2*Math.PI*f*t));
+
+			}
+
+			function fft(s) {
+
+				var a = 0;
+				var e = [], E = [];		// even
+				var o = [], O = []; 	// odd
+				var N = s.length;
+
+				var r = new Array(N);	// result
+
+				if (N > 1) {
+					for (var n = 0; n < N; n++) {
+						if (n%2 === 0) {
+							e.push(s[n]);
+						} else {
+							o.push(s[n]);
+						}
+					}
+
+					E = fft(e); O = fft(o);
+
+					for (var k = 0; k < N/2; k++) {
+						a = 2*Math.PI*k/N;
+						/* (E[k][0] + jE[k][1]) + (cos(a) - jsin(a))*(O[k][0] + jO[k][1]) */
+						r[k] = [
+							E[k][0] + (Math.cos(a)*O[k][0] + Math.sin(a)*O[k][1]),
+							E[k][1] + (Math.cos(a)*O[k][1] - Math.sin(a)*O[k][0])];
+						r[k + N/2] = [
+							E[k][0] - (Math.cos(a)*O[k][0] + Math.sin(a)*O[k][1]),
+							E[k][1] - (Math.cos(a)*O[k][1] - Math.sin(a)*O[k][0])];
+					}
+
+				} else {
+					r[0] = [s[0], 0];
+				}
+
+				return r;
+
+			}
+
+			function loop() {
+
+				var levels = 8,		// number of levels
+					iq; 			// In-phase and Quadrature components
+
+				var symbols = updateInterval/Ts,
+					samplesPerSymbol = Ts*sr;
+
+				for (var j = 0; j < symbols; j++) {
+
+					iq = getSymbol(levels);
+
+					// sample that symbol
+					for (var n = 0; n < samplesPerSymbol; n++) {
+
+						if (buffer.length >= N) {
+							buffer.splice(0, 1);
+						}
+
+						buffer.push(qam(iq[0], iq[1], freq, n/sr));
+
+					}
+
+				}
+
+				F = fft(buffer);
+
+				// Spectrum
+				for (var j = 0; j < F.length; j++) {
+					Sy[j] = 10*Math.log(Math.sqrt(Math.pow(F[j][0], 2) + Math.pow(F[j][1], 2)));
+				}
+	
+				// Plot the time serie
+				//graph.clear(options).plot(buffer, x, [256, 511], [-4, 4]);
+
+				// Plot the spectrum
+				graph.clear(options).plot(Sy, Sx, [0,0.5], [0,70]);
+
+				// Constellation
+				//graph.clear(options).points([iq[0]], [iq[1]], [-4, 4], [-4, 4]);
+
+				setTimeout(loop, 1000*updateInterval);
+
+			}
+
+			loop();
+		</script>
+	</body>
+</html>
