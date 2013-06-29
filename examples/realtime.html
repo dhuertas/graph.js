@@ -34,39 +34,38 @@
 			<p>The example below plots the spectrum of a random generated 64-QAM modulation:</p>
 			<div id="spectrum"></div>
 			<h2>Example code</h2>
-			<pre>var options 		= {
-	appendTo 			: "spectrum",
-	canvasWidth 		: 800,
-	canvasHeight 		: 800/Math.sqrt(2),
-	drawYAxis			: 3,
-	drawYAxisNumbers	: true,
-	drawXAxis			: 3,
-	drawXAxisNumbers	: true,
-	drawGrid 			: true,
-	showValues			: false,
-
-	drawTitle			: true,
-	title				: "64-QAM spectrum (sampling rate: 16kHz, center frequency: 4kHz, symbol time: 1ms, no window)",
-	drawXAxisTitle		: true,
-	xAxisTitle 			: "Discrete frequency (f)"
+			<pre>var options = {
+	appendTo : "spectrum",
+	canvasWidth : 800,
+	canvasHeight : 800/Math.sqrt(2),
+	drawYAxis : 3,
+	drawYAxisNumbers : true,
+	drawXAxis : 3,
+	drawXAxisNumbers : true,
+	drawGrid : true,
+	showValues : false,
+	drawTitle : true,
+	title : "64-QAM spectrum",
+	drawXAxisTitle : true,
+	xAxisTitle : "Discrete frequency (f)"
 };
 
-var graph 			= new Graph(options);
+var graph = new Graph(options);
 
-var N 				= 1024,				// Buffer length
-	buffer 			= new Array(N);
+var N = 1024, // Buffer length
+	buffer = new Array(N);
 
-var freq 			= 4000,				// Analog signal frequency
-	Ts				= 0.001;			// Symbol time
+var freq = 4000, // Analog signal frequency
+	Ts = 0.001; // Symbol time
 
-var sr				= 16000;			// Sample rate
+var sr = 16000; // Sample rate
 
-var updateInterval	= 0.025;			// In seconds
+var updateInterval = 0.025; // In seconds
 
-var Sx 				= [], 				// Spectrum x axis points
-	x 				= new Array(512),	// Buffer x axis points
-	Sy 				= new Array(512),	// Spectrum y axis points
-	F;									// Stores the resulting FFT
+var Sx = [], // Spectrum x axis points
+	x = new Array(512),	// Buffer x axis points
+	Sy = new Array(512), // Spectrum y axis points
+	F; // Stores the resulting FFT
 
 for (var j = 0; j < N; j++) {
 	buffer[j] = 0;
@@ -86,35 +85,35 @@ function getSymbol (n) {
 
 	} else if (n == 4) {
 
-		if (0 <= i && i < 0.25) 		i = -(3/2);
-		else if (0.25 <= i && i < 0.5) 	i = -(1/2);
-		else if (0.5 <= i && i < 0.75) 	i = 1/2;
-		else 							i = 3/2;
+		if (0 <= i && i < 0.25) i = -(3/2);
+		else if (0.25 <= i && i < 0.5) i = -(1/2);
+		else if (0.5 <= i && i < 0.75) i = 1/2;
+		else i = 3/2;
 
-		if (0 <= q && q < 0.25) 		q = -(3/2);
-		else if (0.25 <= q && q < 0.5) 	q = -(1/2);
-		else if (0.5 <= q && q < 0.75) 	q = 1/2;
-		else 							q = 3/2;
+		if (0 <= q && q < 0.25) q = -(3/2);
+		else if (0.25 <= q && q < 0.5) q = -(1/2);
+		else if (0.5 <= q && q < 0.75) q = 1/2;
+		else q = 3/2;
 
 	} else if (n == 8) {
 
-		if (0 <= i && i < 0.125)			i = -(7/2);
-		else if (0.125 <= i && i < 0.25)	i = -(5/2);
-		else if (0.25 <= i && i < 0.375)	i = -(3/2);
-		else if (0.375 <= i && i < 0.5)		i = -(1/2);
-		else if (0.5 <= i && i < 0.625)		i = 1/2;
-		else if (0.625 <= i && i < 0.75)	i = 3/2;
-		else if (0.75 <= i && i < 0.875)	i = 5/2;
-		else 								i = 7/2;
+		if (0 <= i && i < 0.125) i = -(7/2);
+		else if (0.125 <= i && i < 0.25) i = -(5/2);
+		else if (0.25 <= i && i < 0.375) i = -(3/2);
+		else if (0.375 <= i && i < 0.5) i = -(1/2);
+		else if (0.5 <= i && i < 0.625) i = 1/2;
+		else if (0.625 <= i && i < 0.75) i = 3/2;
+		else if (0.75 <= i && i < 0.875) i = 5/2;
+		else i = 7/2;
 
-		if (0 <= q && q < 0.125)			q = -(7/2);
-		else if (0.125 <= q && q < 0.25)	q = -(5/2);
-		else if (0.25 <= q && q < 0.375)	q = -(3/2);
-		else if (0.375 <= q && q < 0.5)		q = -(1/2);
-		else if (0.5 <= q && q < 0.625)		q = 1/2;
-		else if (0.625 <= q && q < 0.75)	q = 3/2;
-		else if (0.75 <= q && q < 0.875)	q = 5/2;
-		else 								q = 7/2;
+		if (0 <= q && q < 0.125) q = -(7/2);
+		else if (0.125 <= q && q < 0.25) q = -(5/2);
+		else if (0.25 <= q && q < 0.375) q = -(3/2);
+		else if (0.375 <= q && q < 0.5) q = -(1/2);
+		else if (0.5 <= q && q < 0.625) q = 1/2;
+		else if (0.625 <= q && q < 0.75) q = 3/2;
+		else if (0.75 <= q && q < 0.875) q = 5/2;
+		else q = 7/2;
 
 	} else {
 
@@ -135,11 +134,11 @@ function qam(i, q, f, t) {
 function fft(s) {
 
 	var a = 0;
-	var e = [], E = [];		// even
-	var o = [], O = []; 	// odd
+	var e = [], E = []; // even
+	var o = [], O = []; // odd
 	var N = s.length;
 
-	var r = new Array(N);	// result
+	var r = new Array(N); // result
 
 	if (N > 1) {
 		for (var n = 0; n < N; n++) {
@@ -154,7 +153,7 @@ function fft(s) {
 
 		for (var k = 0; k < N/2; k++) {
 			a = 2*Math.PI*k/N;
-			/* (E[k][0] + jE[k][1]) + (cos(a) - jsin(a))*(O[k][0] + jO[k][1]) */
+			// (E[k][0] + jE[k][1]) + (cos(a) - jsin(a))*(O[k][0] + jO[k][1])
 			r[k] = [
 				E[k][0] + (Math.cos(a)*O[k][0] + Math.sin(a)*O[k][1]),
 				E[k][1] + (Math.cos(a)*O[k][1] - Math.sin(a)*O[k][0])];
@@ -173,8 +172,8 @@ function fft(s) {
 
 function loop() {
 
-	var levels = 8,		// number of levels
-		iq; 			// In-phase and Quadrature components
+	var levels = 8, // number of levels
+		iq; // In-phase and Quadrature components
 
 	var symbols = updateInterval/Ts,
 		samplesPerSymbol = Ts*sr;
@@ -231,7 +230,7 @@ loop();</pre>
 				showValues			: false,
 
 				drawTitle			: true,
-				title				: "64-QAM spectrum (sampling rate: 16kHz, center frequency: 4kHz, symbol time: 1ms, no window)",
+				title				: "64-QAM spectrum (sampling rate: 16kHz, center frequency: 4kHz, symbol time: 1ms, no window used)",
 				drawXAxisTitle		: true,
 				xAxisTitle 			: "Discrete frequency (f)"
 			};
