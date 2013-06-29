@@ -34,6 +34,8 @@
 			<h1>Plot Function</h1>
 			<p>Plot a graph from a function. The library allows you to plot multiple 
 				lines in a same graph. See example below:</p>
+			<div id="graph"></div>
+			<h2>Example code</h2>
 			<pre>
 var graph = new Graph({
 	appendTo : "container",
@@ -58,7 +60,7 @@ for (var i = 1; i < 6; i++) {
 	
 		<script type="text/javascript" charset="utf-8">
 			var graph = new Graph({
-				appendTo : "container",
+				appendTo : "graph",
 				canvasWidth : 800,
 				canvasHeight : 800/Math.sqrt(2),
 				title : "Gaussian Function",

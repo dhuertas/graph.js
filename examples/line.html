@@ -32,9 +32,10 @@
 		
 		<div id="container">
 			<h1>Plot Line</h1>
-			<p>
-				A simple example. Works much like any other plot library. Here is the
+			<p>A simple example. Works much like any other plot library. Here is the
 				javascript code:</p>
+			<div id="graph"></div>
+			<h2>Example code</h2>
 			<pre>
 var graph = new Graph({
 	appendTo : "container",
@@ -68,7 +69,7 @@ graph.plot(py, px);</pre>
 		<script type="text/javascript" charset="utf-8">
 		
 			var graph = new Graph({
-				appendTo : "container",
+				appendTo : "graph",
 				canvasWidth : 800,
 				canvasHeight : 800/Math.sqrt(2),
 				title : "Sine And Cosine Functions",

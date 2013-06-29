@@ -35,6 +35,8 @@
 			<p>Export the generated graph to an image. The image is exported to png 
 				format by default, although the user is able to change it by 
 				passing the format type as argument. See example below:</p>
+			<div id="graph"></div>
+			<h2>Example code</h2>
 			<pre>
 var PI = Math.PI,
     abs = Math.abs,
@@ -108,7 +110,7 @@ document.getElementById("container").appendChild(graph.toImage());</pre>
 				graph.plotFunction(raisedCosine, [-1/T, 1, 1/T], [0, T]);
 			}
 
-			document.getElementById("container").appendChild(graph.toImage());
+			document.getElementById("graph").appendChild(graph.toImage());
 		</script>
 	</body>
 </html>
