@@ -18,7 +18,7 @@ And you are done!
 **Examples**
 
 Where to start? Browse some examples to see how it works:
-- [Line](http://htmlpreview.github.com/?https://raw.githubusercontent.com/dhuertas/graph.js/master/examples/line.html)
+- [Line](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/line.html)
 - [Function](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/function.html)
 - [Points](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/points.html)
 - [Polar graphs](http://htmlpreview.github.com/?https://github.com/dhuertas/graph.js/blob/master/examples/polar.html)
