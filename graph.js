@@ -2,13 +2,14 @@
  * @author dhuertas
  * @email huertas.dani@gmail.com
  */
+
 var Graph = (function() {
 
 	/* helper functions */
 	function isArray(a) {
 		
 		return (Object.prototype.toString.call(a) === '[object Array]');
-	
+
 	}
 
 	function inArray(needle, haystack) {
@@ -22,11 +23,42 @@ var Graph = (function() {
 		return false;
 
 	}
-	
+
 	function log(value, base) {
 		return Math.log(value)/Math.log(base ? base : 10);
 	}
-	
+
+	function parseDate(date, format) {
+
+		var d = new Date(parseFloat(date)*1000);
+		var len = (typeof format !== 'undefined') ? format.length : 0;
+		var str = "";
+		var i = 0, j = 0, v = 0;
+
+		while (i < len) {
+
+			if (format[i] != '%') {
+				str = str.concat(format[i]);
+				i++;
+				continue;
+			}
+
+			i++;
+			switch(format[i]) {
+				case '%': str = str.concat('%'); break;
+				case 'H': v = d.getHours(); str = str.concat(v<10 ? "0"+v : v); break;
+				case 'M': v = d.getMinutes(); str = str.concat(v<10 ? "0"+v : v); break;
+				case 's': v = d.getSeconds(); str = str.concat(v<10 ? "0"+v : v); break;
+				case 'Y': v = d.getFullYear(); str = str.concat(v<10 ? "0"+v : v); break;
+				case 'm': v = d.getMonth()+1; str = str.concat(v<10 ? "0"+v : v); break;
+				case 'd': v = d.getDate(); str = str.concat(v<10 ? "0"+v : v); break;
+			}
+			i++;
+		}
+
+		return str;
+	}
+
 	function construct(options) {
 
 		this.GRAPH = {
@@ -81,19 +113,23 @@ var Graph = (function() {
 			yAxisColor : "#000",
 			yAxisTextBaseline : "middle",
 			yAxisTextAlign : "right",
+			yAxisTextRotate : 0,
+			yAxisDatetimeFormat : "",
 			yAxisNumSteps : 6, // same as yGridNumLines
 			yAxisNumDecimals : 2,
 			yAxisMarkLength : 3, // Mark length in pixels
 			yAxisTitle : "",
 			yAxisScale : "lin", // options are: "lin", "log"
 			yAxisLogBase : 10,
-			
+
 			xAxisTopMargin : 0.9285714286, // 92.86 % height (15 mm from bottom)
 			xAxisBottomMargin : 0.9285714286, // 92.86 % height (15 mm from top)
 			xAxisLineWidth : 1,
 			xAxisColor : "#000",
 			xAxisTextBaseline : "top",
 			xAxisTextAlign : "center",
+			xAxisTextRotate : 0,
+			xAxisDatetimeFormat : "",
 			xAxisNumSteps : 8, // same as xGridNumLines
 			xAxisNumDecimals : 2,
 			xAxisMarkLength : 3, // Mark length in pixels
@@ -125,7 +161,7 @@ var Graph = (function() {
 		this.xMax = 0;
 		this.xMin = 0;
 		this.yMax = 0;
-			
+
 		/* Start and end points of the graph area */
 		this.xStart = 0;
 		this.xEnd = 0;
@@ -166,23 +202,21 @@ var Graph = (function() {
 		} else if (this.GRAPH.appendTo) {
 			this.elem = document.getElementById(this.GRAPH.appendTo);
 			this.elem.appendChild(this.canvas);
-		} else {
-			
 		}
 
 		this.context = this.canvas.getContext("2d");
 
 		/* Set the background color */
 		this.context.save();
-		
+
 		this.context.fillStyle = this.GRAPH.bgColor;
 		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		
+
 		this.context.restore();
-		
+
 		/* Number of plotted graphs */
 		this.numberOfGraphs = 0;
-		
+
 		/* Start and end points of the graph area */
 		this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
 		this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
@@ -192,30 +226,30 @@ var Graph = (function() {
 		if (this.GRAPH.showValues) {
 			var self = this,
 				div = document.createElement("div");
-				
+
 			div.setAttribute("id", "values");
 			div.style.position = "absolute";
 			div.style.backgroundColor = "rgba(255,255,255,0.9)";
-			div.style.border = "1px solid #ccc";
+			div.style.border = "1px solid #666";
 			div.style.fontSize = this.GRAPH.fontSize+"px";
+			div.style.lineHeight = (this.GRAPH.fontSize+4)+"px";
 			div.style.padding = "5px";
-			div.style.boxShadow = "1px 1px 3px #ccc";
-			
+
 			document.getElementsByTagName("body")[0].appendChild(div);
-				
+
 			this.canvas.addEventListener('mousemove', function(e) {
-			
+
 				var rect = self.canvas.getBoundingClientRect(),
 					x = e.clientX-rect.left, 
 					y = e.clientY-rect.top,
 					p = self.getCoordinates(x, y);
-					
+
 					div.style.top = (e.pageY+10)+"px";
 					div.style.left = (e.pageX+20)+"px";
-					
+
 					div.innerHTML = ""+
-						"x: "+p[0].toFixed(4)+" "+
-						"y: "+p[1].toFixed(4)+"<br/>"+
+						"x: "+(self.GRAPH.xAxisDatetimeFormat != "" ? parseDate(p[0], self.GRAPH.xAxisDatetimeFormat) : p[0].toFixed(4))+" "+
+						"y: "+(self.GRAPH.yAxisDatetimeFormat != "" ? parseDate(p[1], self.GRAPH.yAxisDatetimeFormat) : p[1].toFixed(4))+"</br>"+
 						"r: "+p[2].toFixed(4)+" "+
 						"t: "+p[3].toFixed(4)+"º";
 			}, false);
@@ -223,7 +257,7 @@ var Graph = (function() {
 			this.canvas.addEventListener('mouseout', function(e) {
 				div.style.display = "none";
 			}, false);
-			
+
 			this.canvas.addEventListener('mouseover', function(e) {
 				div.style.display = "block";
 			}, false);
@@ -356,7 +390,7 @@ var Graph = (function() {
 							py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
 							break;
 					}
-					
+
 					switch (this.GRAPH.xAxisScale) {
 						case 'log':
 						case 'logarithm':
@@ -384,7 +418,7 @@ var Graph = (function() {
 
 			this.context.lineWidth = this.GRAPH.lineWidth;
 			this.context.stroke();
-			
+
 			if (this.GRAPH.lineShowPoints) {
 
 				for (var i = 0, len = y.length; i < len; i++) {
@@ -392,7 +426,7 @@ var Graph = (function() {
 						(this.GRAPH.xAxisScale == "log" ? log(x[i], this.GRAPH.xAxisLogBase) : x[i]) <= xRange[1] && 
 						yRange[0] <= (this.GRAPH.yAxisScale == "log" ? log(y[i], this.GRAPH.yAxisLogBase) : y[i]) && 
 						(this.GRAPH.yAxisScale == "log" ? log(y[i], this.GRAPH.yAxisLogBase) : y[i]) <= yRange[1]) {
-					
+
 						switch (this.GRAPH.yAxisScale) {
 							case 'log':
 							case 'logarithm':
@@ -406,7 +440,7 @@ var Graph = (function() {
 								py = (this.yEnd-this.yStart)*(1-(y[i]-this.yMin)/(this.yMax-this.yMin));
 								break;
 						}
-						
+
 						switch (this.GRAPH.xAxisScale) {
 							case 'log':
 							case 'logarithm':
@@ -420,7 +454,7 @@ var Graph = (function() {
 							default:
 								break;
 						}
-						
+
 						this.context.beginPath();
 						this.context.arc(px, py, this.GRAPH.pointRadius, 0, Math.PI*2, false);
 
@@ -433,7 +467,7 @@ var Graph = (function() {
 							this.context.fill();
 						}
 
-						this.context.closePath();				
+						this.context.closePath();
 					}
 				}
 			}
@@ -589,7 +623,7 @@ var Graph = (function() {
 			return this;
 
 		},
-		
+
 		/* 
 		 * Plot a polar graph 
 		 * @param {array} y (values)
@@ -608,7 +642,7 @@ var Graph = (function() {
 
 			return this.plot(y, x, [-rmax, rmax], [-rmax,rmax]);
 		},
-		
+
 		/* 
 		 * Plot a bars graph 
 		 * @param {array} y (values)
@@ -642,13 +676,10 @@ var Graph = (function() {
 			}
 
 			this.drawYAxisNumbers(this.yMin > 0 ? 0 : this.yMin, this.yMax);
-
 			this.drawYGrid();
-			
 			this.drawLabels(x);
 
 			this.context.save();
-
 			this.context.translate(this.xStart, this.yStart);
 
 			for (var i = 0; i < y.length; i++) {
@@ -667,7 +698,6 @@ var Graph = (function() {
 					default:
 						px += 0;
 						break;
-					
 				}
 
 				/* width and height of the rectangle */
@@ -684,9 +714,7 @@ var Graph = (function() {
 			this.context.restore();
 
 			this.drawTitle();
-
 			this.drawAxis();
-
 			this.drawXAxisTitle();
 			this.drawYAxisTitle();
 
@@ -768,13 +796,12 @@ var Graph = (function() {
 					default:
 						px += 0;
 						break;
-					
 				}
 
 				/* width and height of the rectangle */
 				width = this.GRAPH.barWidth*(this.xEnd-this.xStart)/frec.length;
 				height = (this.yEnd-this.yStart)*frec[i]/this.yMax;
-				
+
 				this.context.beginPath();
 				this.context.rect(px, py, width, height);
 				
@@ -820,7 +847,7 @@ var Graph = (function() {
 					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.strokeStyle = this.GRAPH.yAxisColor;
 					this.context.stroke();
-					
+
 					/* draw marks */
 					if (this.GRAPH.drawYAxisMarks) {
 						this.context.beginPath();
@@ -844,7 +871,7 @@ var Graph = (function() {
 					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.strokeStyle = this.GRAPH.yAxisColor;
 					this.context.stroke();
-					
+
 					/* draw marks */
 					if (this.GRAPH.drawYAxisMarks) {
 						this.context.beginPath();
@@ -878,7 +905,7 @@ var Graph = (function() {
 					this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 					this.context.strokeStyle = this.GRAPH.yAxisColor;
 					this.context.stroke();
-					
+
 					/* draw marks */
 					if (this.GRAPH.drawYAxisMarks) {
 						this.context.beginPath();
@@ -891,7 +918,7 @@ var Graph = (function() {
 							this.context.lineWidth = this.GRAPH.yAxisLineWidth;
 							this.context.strokeStyle = this.GRAPH.yAxisColor;
 							this.context.stroke();
-							
+
 							px = this.xEnd-0.5;
 							py = this.yStart+Math.floor(i*(this.yEnd-this.yStart)/this.GRAPH.yAxisNumSteps);
 							this.context.moveTo(px, py+0.5);
@@ -903,7 +930,7 @@ var Graph = (function() {
 						}
 					}
 					break;
-				
+
 				case 0: break;
 			}
 
@@ -1078,7 +1105,7 @@ var Graph = (function() {
 				this.context.translate(this.xStart, this.yStart);
 
 				this.context.beginPath();
-				
+
 				switch (this.GRAPH.yAxisScale) {
 					case 'log':
 					case 'logarithmic':
@@ -1177,7 +1204,7 @@ var Graph = (function() {
 				this.context.translate(this.xStart, this.yStart);
 
 				this.context.beginPath();
-				
+
 				switch (this.GRAPH.xAxisScale) {
 					case 'log':
 					case 'logarithmic':
@@ -1212,7 +1239,6 @@ var Graph = (function() {
 									}
 									k++;
 								}
-								
 							}
 
 							if (i%this.GRAPH.xAxisLogBase == 0) {
@@ -1251,7 +1277,7 @@ var Graph = (function() {
 						}
 						break;
 				}
-				
+
 				this.context.strokeStyle = this.GRAPH.xGridLineColor;
 				this.context.stroke();
 				this.context.restore();
@@ -1269,7 +1295,7 @@ var Graph = (function() {
 				this.drawXGrid();
 				this.drawYGrid();
 			}
-			
+
 			this.GRAPH.drawGrid = false;
 
 			if (this.GRAPH.drawPolarGrid) {
@@ -1372,7 +1398,7 @@ var Graph = (function() {
 						this.context.textAlign = "left";
 						this.context.textBaseline = "bottom";
 					}
-					
+
 					if (this.GRAPH.polarAxisNumFormat == "deg") {
 						text = (360-alpha*180/Math.PI).toFixed(0)+" º";
 					} else if (this.GRAPH.polarAxisNumFormat == "rad") {
@@ -1380,7 +1406,7 @@ var Graph = (function() {
 					} else {
 						text = (Math.PI*2-alpha).toFixed(2);
 					}
-					
+
 					this.context.fillText(text, npx, npy);
 
 				}
@@ -1390,12 +1416,12 @@ var Graph = (function() {
 
 			return this;
 		},
-		
+
 		/*
 		 * Draws a polar grid
 		 */
 		drawPolarGrid : function drawPolarGrid() {
-	
+
 			var alpha = 0,
 				beta = Math.atan2(this.yEnd-this.yStart,this.xEnd-this.xStart),
 				h, 
@@ -1457,14 +1483,23 @@ var Graph = (function() {
 		 */
 		drawXAxisNumbers : function(start, end) {
 
-			var number;
+			var number, rad = 0, px, py;
 
 			if (this.GRAPH.drawXAxisNumbers) {
+
 				this.context.save();
 
 				this.context.textBaseline = this.GRAPH.xAxisTextBaseline;
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 				this.context.textAlign = this.GRAPH.xAxisTextAlign;
+
+				if (this.GRAPH.xAxisTextRotate == 0) {
+					rad = 0;
+				} else if (Math.abs(this.GRAPH.xAxisTextRotate) < 90) {
+					rad = this.GRAPH.xAxisTextRotate*Math.PI/180;
+				} else {
+					rad = -Math.PI+this.GRAPH.xAxisTextRotate*Math.PI/180;
+				}
 
 				switch (this.GRAPH.xAxisScale) {
 					case 'log':
@@ -1473,9 +1508,18 @@ var Graph = (function() {
 							number = Math.pow(this.GRAPH.xAxisLogBase, (start+i*(end-start)/this.GRAPH.xAxisNumSteps)
 									.toFixed(this.GRAPH.xAxisNumDecimals));
 
-							this.context.fillText(number.toPrecision(4), 
-								this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps, 
-								this.yEnd+3 /* 3px top margin from axis */);
+							if (this.GRAPH.xAxisDatetimeFormat != "") {
+								number = parseDate(number, this.GRAPH.xAxisDatetimeFormat);
+							}
+
+							px = this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps;
+							py = this.yEnd+3;
+
+							this.context.translate(px, py);
+							this.context.rotate(rad);
+							this.context.fillText(number.toPrecision(4), 0, 0);
+							this.context.rotate(-rad);
+							this.context.translate(-px, -py);
 						}
 						break;
 					case 'lin':
@@ -1485,9 +1529,17 @@ var Graph = (function() {
 							number = (start+i*(end-start)/this.GRAPH.xAxisNumSteps)
 									.toFixed(this.GRAPH.xAxisNumDecimals);
 
-							this.context.fillText(number, 
-								this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps, 
-								this.yEnd+3 /* 3px top margin from axis */);
+							if (this.GRAPH.xAxisDatetimeFormat != "") {
+								number = parseDate(number, this.GRAPH.xAxisDatetimeFormat);
+							}
+							px = this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps;
+							py = this.yEnd+3;
+
+							this.context.translate(px, py);
+							this.context.rotate(rad);
+							this.context.fillText(number, 0, 0);
+							this.context.rotate(-rad);
+							this.context.translate(-px, -py);
 						}
 						break;
 				}
@@ -1517,13 +1569,17 @@ var Graph = (function() {
 				this.context.textBaseline = this.GRAPH.yAxisTextBaseline;
 				this.context.font = this.GRAPH.fontWeight+" "+this.GRAPH.fontSize+"px "+this.GRAPH.fontFamily;
 				this.context.textAlign = this.GRAPH.yAxisTextAlign;
-				
+
 				switch (this.GRAPH.yAxisScale) {
 					case 'log':
 					case 'logarithm':
 						for (var i = 0; i <= this.GRAPH.yAxisNumSteps; i++) {
 							number = Math.pow(this.GRAPH.yAxisLogBase, (end-i*(end-start)/this.GRAPH.yAxisNumSteps)
 									.toFixed(this.GRAPH.yAxisNumDecimals));
+
+							if (this.GRAPH.yAxisDatetimeFormat != "") {
+								number = parseDate(number, this.GRAPH.yAxisDatetimeFormat);
+							}
 
 							this.context.fillText(number.toPrecision(4), 
 								this.xStart-5 /* 3px right margin from axis */, 
@@ -1536,6 +1592,10 @@ var Graph = (function() {
 						for (var i = 0; i <= this.GRAPH.yAxisNumSteps; i++) {
 							number = (end-i*(end-start)/this.GRAPH.yAxisNumSteps)
 									.toFixed(this.GRAPH.yAxisNumDecimals);
+
+							if (this.GRAPH.yAxisDatetimeFormat != "") {
+								number = parseDate(number, this.GRAPH.yAxisDatetimeFormat);
+							}
 
 							this.context.fillText(number, 
 								this.xStart-5 /* 3px right margin from axis */, 
@@ -1553,7 +1613,7 @@ var Graph = (function() {
 			return this;
 
 		},
-		
+
 		/*
 		 * Draws the labels for a bar plot
 		 * @param {array} labels
@@ -1578,7 +1638,7 @@ var Graph = (function() {
 			var m = 1;
 
 			if (this.yEnd-this.yStart < labels.length*8) {
-				// Labels doesn't fit!
+				// Labels do not fit!
 				// This 10/250 constant has been calculated by trial and error
 				m = Math.floor(labels.length*10/250);
 			}
@@ -1617,7 +1677,7 @@ var Graph = (function() {
 
 				this.context.textAlign = "center";
 				this.context.font = this.GRAPH.titleFontWeight+" "+this.GRAPH.titleFontSize+"px "+this.GRAPH.fontFamily;
-				
+
 				px = Math.floor(this.xStart + (this.xEnd-this.xStart)/2);
 				py = Math.floor((1-this.GRAPH.xAxisBottomMargin)*this.canvas.height/2);
 
@@ -1734,17 +1794,17 @@ var Graph = (function() {
 			if (options instanceof Object) {
 				for (var elem in options) {
 					if (this.GRAPH[elem] != null) {
-						
+
 						if (elem == "canvasWidth") {
 							this.canvas.setAttribute("width", options[elem]);
 						}
-						
+
 						if (elem == "canvasHeight") {
 							this.canvas.setAttribute("height", options[elem]);
 						}
-						
+
 						this.GRAPH[elem] = options[elem];
-						
+
 					}
 				}
 			}
@@ -1754,18 +1814,18 @@ var Graph = (function() {
 			this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
 			this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
 			this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
-			
+
 			this.numberOfGraphs = 0;
 
 			this.context.save();
-			
+
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 			this.context.restore();
 
 			return this;
 		},
-		
+
 		toImage : function(mime) {
 
 			var image = new Image();
@@ -1774,15 +1834,15 @@ var Graph = (function() {
 
 			return image;
 		},
-		
+
 		getCoordinates : function(x, y) {
 			var yOffset = 0, 
 				xOffset = 0,
 				px, py, r , t;
-			
+
 			x -= xOffset;
 			y -= yOffset;
-			
+
 			switch (this.GRAPH.yAxisScale) {
 				case 'log':
 				case 'logarithm':
@@ -1795,7 +1855,7 @@ var Graph = (function() {
 					py = this.yMin+(this.yMax-this.yMin)*(y-this.yEnd)/(this.yStart-this.yEnd);
 					break;
 			}
-			
+
 			switch (this.GRAPH.xAxisScale) {
 				case 'log':
 				case 'logarithm':
@@ -1808,10 +1868,10 @@ var Graph = (function() {
 					px = this.xMin+(this.xMax-this.xMin)*(x-this.xStart)/(this.xEnd-this.xStart);
 					break;
 			}
-			
+
 			r = Math.sqrt(Math.pow(px, 2)+Math.pow(py, 2));
 			t = Math.atan2(py, px)*180/Math.PI;
-			
+
 			return [px, py, r, t];
 		}
 	}
