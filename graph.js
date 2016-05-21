@@ -221,7 +221,7 @@ var Graph = (function() {
 		this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
 		this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
 		this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
-		this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
+		this.yEnd = Math.floor(this.GRAPH.xAxisBottomMargin*this.canvas.height);
 
 		if (this.GRAPH.showValues) {
 			var self = this,
@@ -1767,7 +1767,7 @@ var Graph = (function() {
 			this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
 			this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
 			this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
-			this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
+			this.yEnd = Math.floor(this.GRAPH.xAxisBottomMargin*this.canvas.height);
 
 			return this;
 		},
@@ -1813,7 +1813,7 @@ var Graph = (function() {
 			this.xStart = Math.floor(this.GRAPH.yAxisLeftMargin*this.canvas.width);
 			this.xEnd = Math.floor((1-this.GRAPH.yAxisRightMargin)*this.canvas.width);
 			this.yStart = Math.floor((1-this.GRAPH.xAxisTopMargin)*this.canvas.height);
-			this.yEnd = Math.floor(this.GRAPH.xAxisTopMargin*this.canvas.height);
+			this.yEnd = Math.floor(this.GRAPH.xAxisBottomMargin*this.canvas.height);
 
 			this.numberOfGraphs = 0;
 
