@@ -1,21 +1,6 @@
-/* 
- * Graph is a library to plot matlab-like charts using HTML 5 canvas
- * 
- * Copyright (C) 2016  Daniel Huertas <huertas.dani@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+/*
+ * @author dhuertas
+ * @email huertas.dani@gmail.com
  */
 
 var Graph = (function() {
@@ -1790,14 +1775,16 @@ var Graph = (function() {
 		/*
 		 * Removes everything from the canvas
 		 */
-		clear : function() {
+		clear : function(options) {
 
 			this.GRAPH.colorIndex = 0;
 			this.GRAPH.pointColorIndex = 0;
 			this.GRAPH.drawYAxis = 3;
 			this.GRAPH.drawYAxisNumbers = true;
+			this.GRAPH.drawYAxisTitle = true;
 			this.GRAPH.drawXAxis = 3;
 			this.GRAPH.drawXAxisNumbers = true;
+			this.GRAPH.drawXAxisTitle = true;
 			this.GRAPH.drawGrid = true;
 			this.GRAPH.drawTitle = true;
 
