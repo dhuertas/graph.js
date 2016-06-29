@@ -7,24 +7,20 @@ var Graph = (function() {
 
   /* helper functions */
   function isArray(a) {
-    
-    return (Object.prototype.toString.call(a) === '[object Array]');
 
+    return (Object.prototype.toString.call(a) === '[object Array]');
   }
 
   function inArray(needle, haystack) {
 
     for (var i = 0; i < haystack.length; i++) {
-
       if (needle == haystack[i]) return true;
-
     }
-
     return false;
-
   }
 
   function log(value, base) {
+
     return Math.log(value)/Math.log(base ? base : 10);
   }
 
@@ -89,6 +85,28 @@ var Graph = (function() {
     return str;
   }
 
+  function computeTimeStep(interval) {
+    if (interval < 12*3600) {
+      return 3600;
+    } else if (12*3600 <= interval && interval < 86400) {
+      return 2*3600;
+    } else if (86400 <= interval && interval < 2*86400) {
+      return 4*3600;
+    } else if (2*86400 <= interval && interval < 15*86400) {
+      // align to every day change
+      return 86400;
+    } else if (15*86400 <= interval && interval < 60*86400) {
+      // align to every week change
+      return 7*86400;
+    } else if (60*86400 <= interval && interval < 180*86400) {
+      // align to every month change
+    } else if (180*86400 <= interval && interval < 2*360*86400) {
+      // align to every 4 months change
+    } else {
+      // align to every year
+    }
+  }
+
   function construct(options) {
 
     this.GRAPH = {
@@ -145,6 +163,7 @@ var Graph = (function() {
       yAxisTextAlign : "right",
       yAxisTextRotate : 0,
       yAxisDatetimeFormat : "",
+      yAxisDatetimeAlignment : false, // align y axis tics with date time (00:00)
       yAxisNumSteps : 6, // same as yGridNumLines
       yAxisNumDecimals : 2,
       yAxisMarkLength : 3, // Mark length in pixels
@@ -160,6 +179,7 @@ var Graph = (function() {
       xAxisTextAlign : "center",
       xAxisTextRotate : 0,
       xAxisDatetimeFormat : "",
+      xAxisDatetimeAlignment : false, // align x axis tics with date time (00:00)
       xAxisNumSteps : 8, // same as xGridNumLines
       xAxisNumDecimals : 2,
       xAxisMarkLength : 3, // Mark length in pixels
@@ -386,7 +406,7 @@ var Graph = (function() {
         yRange.push(this.yMax);
       }
 
-      this.drawGrid();
+      this.drawGrid(this.yMin, this.yMax, this.xMin, this.xMax);
 
       this.context.save();
 
@@ -502,7 +522,7 @@ var Graph = (function() {
       this.context.restore();
 
       this.drawTitle();
-      this.drawAxis();
+      this.drawAxis(this.yMin, this.yMax, this.xMin, this.xMax);
       this.drawXAxisTitle();
       this.drawYAxisTitle();
       this.drawXAxisNumbers(this.xMin, this.xMax);
@@ -598,7 +618,7 @@ var Graph = (function() {
         yRange.push(this.yMax);
       }
 
-      this.drawGrid();
+      this.drawGrid(this.yMin, this.yMax, this.xMin, this.xMax);
       this.GRAPH.drawGrid = false;
 
       this.context.save();
@@ -637,7 +657,7 @@ var Graph = (function() {
 
       this.drawTitle();
 
-      this.drawAxis();
+      this.drawAxis(this.yMin, this.yMax, this.xMin, this.xMax);
 
       this.drawXAxisTitle();
       this.drawYAxisTitle();
@@ -703,7 +723,7 @@ var Graph = (function() {
       }
 
       this.drawYAxisNumbers(this.yMin > 0 ? 0 : this.yMin, this.yMax);
-      this.drawYGrid();
+      this.drawYGrid(this.yMin, this.yMax);
       this.drawLabels(x);
 
       this.context.save();
@@ -741,7 +761,7 @@ var Graph = (function() {
       this.context.restore();
 
       this.drawTitle();
-      this.drawAxis();
+      this.drawAxis(this.yMin, this.yMax, this.xMin, this.xMax);
       this.drawXAxisTitle();
       this.drawYAxisTitle();
 
@@ -801,7 +821,7 @@ var Graph = (function() {
       this.drawYAxisNumbers( this.yMin > 0 ? 0 : this.yMin, this.yMax);
       this.drawXAxisNumbers(this.xMin, this.xMax);
 
-      this.drawYGrid();
+      this.drawYGrid(this.yMin, this.yMax);
 
       this.context.save();
 
@@ -840,7 +860,7 @@ var Graph = (function() {
 
       this.drawTitle();
 
-      this.drawAxis();
+      this.drawAxis(this.yMin, this.yMax, this.xMin, this.xMax);
 
       this.drawXAxisTitle();
       this.drawYAxisTitle();
@@ -974,7 +994,7 @@ var Graph = (function() {
      *   2: top x axis is drawn
      *   3: both x axis are drawn
      */
-    drawXAxis : function() {
+    drawXAxis : function(start, end) {
 
       var px = 0,
         py = 0;
@@ -997,15 +1017,43 @@ var Graph = (function() {
           /* draw marks */
           if (this.GRAPH.drawXAxisMarks) {
             this.context.beginPath();
-            for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
-              px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
-              py = this.yEnd-0.5;
-              this.context.moveTo(px, py);
-              this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
+            if (this.GRAPH.xAxisDatetimeAlignment) {
+              // draw x grid lines at specific times (e.g. at 00:00)
+              var current = new Date(start*1000),
+                tsEnd = new Date(end*1000)
 
-              this.context.lineWidth = this.GRAPH.yAxisLineWidth;
-              this.context.strokeStyle = this.GRAPH.xAxisColor;
-              this.context.stroke();
+              var diff = end - start;
+              var timeStep = computeTimeStep(diff);
+              current.setTime( (parseInt(current.getTime()/1000) + timeStep 
+                + (timeStep >= 86400 ? current.getTimezoneOffset()*60 : 0) 
+                - parseInt(current.getTime()/1000) % timeStep)*1000);
+              timeStep *= 1000;
+
+              while (current < tsEnd) {
+
+                px = this.xStart+Math.floor( (current.getTime()/1000 - start)*(this.xEnd - this.xStart)/(end-start) )+0.5;
+                py = this.yEnd-0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+
+                // next round date time
+                current.setTime(current.getTime() + timeStep);
+              }
+            } else {
+              for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
+                px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+                py = this.yEnd-0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+              }
             }
           }
           break;
@@ -1023,15 +1071,43 @@ var Graph = (function() {
           /* draw marks */
           if (this.GRAPH.drawXAxisMarks) {
             this.context.beginPath();
-            for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
-              px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
-              py = this.yStart+0.5;
-              this.context.moveTo(px, py);
-              this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
+            if (this.GRAPH.xAxisDatetimeAlignment) {
+              // draw x grid lines at specific times (e.g. at 00:00)
+              var current = new Date(start*1000),
+                tsEnd = new Date(end*1000)
 
-              this.context.lineWidth = this.GRAPH.yAxisLineWidth;
-              this.context.strokeStyle = this.GRAPH.xAxisColor;
-              this.context.stroke();
+              var diff = end - start;
+              var timeStep = computeTimeStep(diff);
+              current.setTime( (parseInt(current.getTime()/1000) + timeStep 
+                + (timeStep >= 86400 ? current.getTimezoneOffset()*60 : 0) 
+                - parseInt(current.getTime()/1000) % timeStep)*1000);
+              timeStep *= 1000;
+
+              while (current < tsEnd) {
+
+                px = this.xStart+Math.floor( (current.getTime()/1000 - start)*(this.xEnd - this.xStart)/(end-start) )+0.5;
+                py = this.yStart+0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+
+                // next round date time
+                current.setTime(current.getTime() + timeStep);
+              }
+            } else {
+              for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
+                px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+                py = this.yStart+0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+              }
             }
           }
           break;
@@ -1059,24 +1135,59 @@ var Graph = (function() {
           /* draw marks */
           if (this.GRAPH.drawXAxisMarks) {
             this.context.beginPath();
-            for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
-              px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
-              py = this.yEnd-0.5;
-              this.context.moveTo(px, py);
-              this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
+            if (this.GRAPH.xAxisDatetimeAlignment) {
+              // draw x grid lines at specific times (e.g. at 00:00)
+              var current = new Date(start*1000),
+                tsEnd = new Date(end*1000)
 
-              this.context.lineWidth = this.GRAPH.yAxisLineWidth;
-              this.context.strokeStyle = this.GRAPH.xAxisColor;
-              this.context.stroke();
+              var diff = end - start;
+              var timeStep = computeTimeStep(diff);
+              current.setTime( (parseInt(current.getTime()/1000) + timeStep 
+                + (timeStep >= 86400 ? current.getTimezoneOffset()*60 : 0) 
+                - parseInt(current.getTime()/1000) % timeStep)*1000);
+              timeStep *= 1000;
 
-              px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
-              py = this.yStart+0.5;
-              this.context.moveTo(px, py);
-              this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
+              while (current < tsEnd) {
 
-              this.context.lineWidth = this.GRAPH.yAxisLineWidth;
-              this.context.strokeStyle = this.GRAPH.xAxisColor;
-              this.context.stroke();
+                px = this.xStart+Math.floor( (current.getTime()/1000 - start)*(this.xEnd - this.xStart)/(end-start) )+0.5;
+                py = this.yEnd-0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+
+                py = this.yStart+0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+
+                // next round date time
+                current.setTime(current.getTime() + timeStep);
+              }
+            } else {
+              for (var i = this.GRAPH.xAxisNumSteps; i > 0; i--) {
+                px = this.xStart+Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps)+0.5;
+                py = this.yEnd-0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py-this.GRAPH.xAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+
+                py = this.yStart+0.5;
+                this.context.moveTo(px, py);
+                this.context.lineTo(px, py+this.GRAPH.yAxisMarkLength);
+
+                this.context.lineWidth = this.GRAPH.yAxisLineWidth;
+                this.context.strokeStyle = this.GRAPH.xAxisColor;
+                this.context.stroke();
+              }
             }
           }
           break;
@@ -1091,17 +1202,17 @@ var Graph = (function() {
     /*
      * Draws both x and y axis
      */
-    drawAxis : function() {
+    drawAxis : function(yMin, yMax, xMin, xMax) {
 
       if (this.GRAPH.drawYAxis) {
-        this.drawYAxis();
+        this.drawYAxis(yMin, yMax);
       }
 
       /* draw y axis only one time */
       this.GRAPH.drawYAxis = false;
 
       if (this.GRAPH.drawXAxis) {
-        this.drawXAxis(); 
+        this.drawXAxis(xMin, xMax); 
       }
 
       /* draw x axis only one time */
@@ -1118,7 +1229,7 @@ var Graph = (function() {
 
     },
 
-    drawYGrid : function() {
+    drawYGrid : function(start, end) {
 
       var drawed = 0,
         yPos = 0,
@@ -1217,7 +1328,7 @@ var Graph = (function() {
       return this;
     },
     
-    drawXGrid : function() {
+    drawXGrid : function(start, end) {
 
       var drawed = 0,
         yPos = 0,
@@ -1280,26 +1391,65 @@ var Graph = (function() {
           case 'lin':
           case 'linear':
           default:
-            for (var i = 1; i <= this.GRAPH.xGridNumLines-1; i++) {
+            if (this.GRAPH.xAxisDatetimeAlignment) {
+              // draw x grid lines at specific times (e.g. at 00:00)
+              var current = new Date(start*1000),
+                tsEnd = new Date(end*1000)
 
-              xPos = Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xGridNumLines);
-              drawed = 0;
-              this.context.moveTo(xPos, (this.yEnd-this.yStart));
-              k = 0;
-              
-              while (drawed < (this.yEnd-this.yStart)) {
-                /* Move from bottom to top */
-                switch (k%2) {
-                  case 0:
-                    drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
-                    this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
-                    break;
-                  case 1:
-                    drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
-                    this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
-                    break;
+              var diff = end - start;
+              var timeStep = computeTimeStep(diff);
+              current.setTime( (parseInt(current.getTime()/1000) + timeStep 
+                + (timeStep >= 86400 ? current.getTimezoneOffset()*60 : 0) 
+                - parseInt(current.getTime()/1000) % timeStep)*1000);
+              timeStep *= 1000;
+
+              while (current < tsEnd) {
+
+                xPos = Math.floor( (current.getTime()/1000 - start)*(this.xEnd - this.xStart)/(end-start) );
+                drawed = 0;
+                this.context.moveTo(xPos, (this.yEnd-this.yStart));
+                k = 0;
+
+                while (drawed < (this.yEnd-this.yStart)) {
+                  // Move from bottom to top
+                  switch (k%2) {
+                    case 0:
+                      drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
+                      this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+                      break;
+                    case 1:
+                      drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
+                      this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+                      break;
+                  }
+                  k++;
                 }
-              k++;
+
+                // next round date time
+                current.setTime(current.getTime() + timeStep);
+              }
+            } else {
+              for (var i = 1; i <= this.GRAPH.xGridNumLines-1; i++) {
+
+                xPos = Math.floor(i*(this.xEnd-this.xStart)/this.GRAPH.xGridNumLines);
+                drawed = 0;
+                this.context.moveTo(xPos, (this.yEnd-this.yStart));
+                k = 0;
+
+                while (drawed < (this.yEnd-this.yStart)) {
+                  // Move from bottom to top
+                  switch (k%2) {
+                    case 0:
+                      drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridSpaceLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridSpaceLength;
+                      this.context.moveTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+                      break;
+                    case 1:
+                      drawed = ((this.yEnd-this.yStart)-drawed < this.GRAPH.yGridLineLength) ? (this.yEnd-this.yStart) : drawed+this.GRAPH.yGridLineLength;
+                      this.context.lineTo(xPos+0.5, (this.yEnd-this.yStart)-drawed);
+                      break;
+                  }
+                k++;
+                }
               }
             }
             break;
@@ -1312,15 +1462,15 @@ var Graph = (function() {
 
       return this;
     },
-    
+
     /*
      * Draws the grid using the specified options
      */
-    drawGrid : function() {
+    drawGrid : function(yStart, yEnd, xStart, xEnd) {
 
       if (this.GRAPH.drawGrid) {
-        this.drawXGrid();
-        this.drawYGrid();
+        this.drawXGrid(xStart, xEnd);
+        this.drawYGrid(yStart, yEnd);
       }
 
       this.GRAPH.drawGrid = false;
@@ -1435,7 +1585,6 @@ var Graph = (function() {
           }
 
           this.context.fillText(text, npx, npy);
-
         }
 
         this.context.restore();
@@ -1552,21 +1701,53 @@ var Graph = (function() {
           case 'lin':
           case 'linear':
           default:
-            for (var i = 0; i <= this.GRAPH.xAxisNumSteps; i++) {
-              number = (start+i*(end-start)/this.GRAPH.xAxisNumSteps)
+
+            if (this.GRAPH.xAxisDatetimeAlignment) {
+              // draw tic labels at specific times (e.g. at 00:00)
+              var current = new Date(start*1000),
+                tsEnd = new Date(end*1000)
+
+              var diff = end - start;
+              var timeStep = computeTimeStep(diff);
+              current.setTime( (parseInt(current.getTime()/1000) + timeStep 
+                + (timeStep >= 86400 ? current.getTimezoneOffset()*60 : 0) 
+                - parseInt(current.getTime()/1000) % timeStep)*1000);
+              timeStep *= 1000;
+
+              while (current < tsEnd) {
+
+                number = parseDate(current.getTime()/1000, this.GRAPH.xAxisDatetimeFormat);
+
+                px = this.xStart + (current.getTime()/1000 - start)*(this.xEnd - this.xStart)/(end-start);
+                py = this.yEnd+3;
+
+                this.context.translate(px, py);
+                this.context.rotate(rad);
+                this.context.fillText(number, 0, 0);
+                this.context.rotate(-rad);
+                this.context.translate(-px, -py);
+
+                // next round date time
+                current.setTime(current.getTime() + timeStep);
+              }
+            } else {
+
+              for (var i = 0; i <= this.GRAPH.xAxisNumSteps; i++) {
+                number = (start+i*(end-start)/this.GRAPH.xAxisNumSteps)
                   .toFixed(this.GRAPH.xAxisNumDecimals);
 
-              if (this.GRAPH.xAxisDatetimeFormat != "") {
-                number = parseDate(number, this.GRAPH.xAxisDatetimeFormat);
-              }
-              px = this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps;
-              py = this.yEnd+3;
+                if (this.GRAPH.xAxisDatetimeFormat != "") {
+                  number = parseDate(number, this.GRAPH.xAxisDatetimeFormat);
+                }
+                px = this.xStart+i*(this.xEnd-this.xStart)/this.GRAPH.xAxisNumSteps;
+                py = this.yEnd+3;
 
-              this.context.translate(px, py);
-              this.context.rotate(rad);
-              this.context.fillText(number, 0, 0);
-              this.context.rotate(-rad);
-              this.context.translate(-px, -py);
+                this.context.translate(px, py);
+                this.context.rotate(rad);
+                this.context.fillText(number, 0, 0);
+                this.context.rotate(-rad);
+                this.context.translate(-px, -py);
+              }
             }
             break;
         }
