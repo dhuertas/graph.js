@@ -27,12 +27,12 @@ Here are some screenshots:
 
 
 Where to start? Browse some examples to see how it works:
-- [Line](https://github.com/dhuertas/graph.js/blob/master/examples/line.html)
-- [Function](https://github.com/dhuertas/graph.js/blob/master/examples/function.html)
-- [Points](https://github.com/dhuertas/graph.js/blob/master/examples/points.html)
-- [Polar graphs](https://github.com/dhuertas/graph.js/blob/master/examples/polar.html)
-- [Bar charts](https://github.com/dhuertas/graph.js/blob/master/examples/bars.html)
-- [Histogram graphs](https://github.com/dhuertas/graph.js/blob/master/examples/histogram.html)
-- [Semi-Log graphs](https://github.com/dhuertas/graph.js/blob/master/examples/response.html)
-- [Export graph to an image](https://github.com/dhuertas/graph.js/blob/master/examples/image.html)
-- [Realtime graphs](https://github.com/dhuertas/graph.js/blob/master/examples/realtime.html)
+- [Line](https://github.com/dhuertas/graph.js/blob/master/htmldocs/line.html)
+- [Function](https://github.com/dhuertas/graph.js/blob/master/htmldocs/function.html)
+- [Points](https://github.com/dhuertas/graph.js/blob/master/htmldocs/points.html)
+- [Polar graphs](https://github.com/dhuertas/graph.js/blob/master/htmldocs/polar.html)
+- [Bar charts](https://github.com/dhuertas/graph.js/blob/master/htmldocs/bars.html)
+- [Histogram graphs](https://github.com/dhuertas/graph.js/blob/master/htmldocs/histogram.html)
+- [Semi-Log graphs](https://github.com/dhuertas/graph.js/blob/master/htmldocs/response.html)
+- [Export graph to an image](https://github.com/dhuertas/graph.js/blob/master/htmldocs/image.html)
+- [Realtime graphs](https://github.com/dhuertas/graph.js/blob/master/htmldocs/realtime.html)
