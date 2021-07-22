@@ -2,8 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<title>Graph.js - Plot Points</title>
-		<script src="https://raw.githubusercontent.com/dhuertas/graph.js/master/graph.js" type="text/javascript"></script>
+		<title>Graph.js - Histogram</title>
+		<script src="../graph.js" type="text/javascript"></script>
 	</head>
 	<style>
 		body {width: 100%;
@@ -11,13 +11,14 @@
 			padding: 0;
 			
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-			font-size: 14px;
+			font-size: 12px;
 			color: #333;
 		}
 
 		#container {
 			width: 800px;
 			margin: 50px auto;
+			font-size: 14px;
 		}
 		
 		pre {
@@ -31,8 +32,8 @@
 	<body>
 		
 		<div id="container">
-			<h1>Plot Points</h1>
-			<p>Plot points on a 2D graph. See example below:</p>
+			<h1>Histogram</h1>
+			<p>Plots a histogram. The following example plots the Gaussian distribution of a Box Müller algorithm. See example below:</p>
 			<div id="graph"></div>
 			<h2>Example code</h2>
 			<pre>
@@ -40,21 +41,21 @@ var graph = new Graph({
 	appendTo : "container",
 	canvasWidth : 800,
 	canvasHeight : 800/Math.sqrt(2),
-	title : "Box Müller",
-	xAxisTitle : "x",
-	yAxisTitle : "y"
-});
+	colorList : ["#00F"],
+	barWidth : 0.8,
+	barPosition : "center",
+	title : "Box Müller Histogram"
+}); 
 
-var px = [], py = [];
-
+var y = [];
+			
 for (var i = 0; i < 1000; i++) {
 	r = Math.random();
 	s = Math.random();
-	py.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
-	px.push(Math.sqrt(-2*Math.log(1-r))*Math.sin(Math.PI*2*s));
+	y.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
 }
 
-graph.points(py, px);</pre>
+graph.histogram(y, 40);</pre>
 		</div>
 	
 		<script type="text/javascript" charset="utf-8">
@@ -62,21 +63,22 @@ graph.points(py, px);</pre>
 				appendTo : "graph",
 				canvasWidth : 800,
 				canvasHeight : 800/Math.sqrt(2),
-				title : "Box Müller",
-				xAxisTitle : "x",
-				yAxisTitle : "y"
-			});
-			
-			var px = [], py = [];
-			
+				colorList : ["#00F"],
+				barWidth : 0.8,
+				barPosition : "center",
+				title : "Box Müller Histogram",
+				yAxisTitle : "samples"
+			}); 
+
+			var y = [];
+
 			for (var i = 0; i < 1000; i++) {
 				r = Math.random();
 				s = Math.random();
-				py.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
-				px.push(Math.sqrt(-2*Math.log(1-r))*Math.sin(Math.PI*2*s));
+				y.push(Math.sqrt(-2*Math.log(1-r))*Math.cos(Math.PI*2*s));
 			}
-			
-			graph.points(py, px);
+
+			graph.histogram(y, 40);
 		</script>
 	</body>
 </html>
