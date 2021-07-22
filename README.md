@@ -18,10 +18,9 @@ And you are done!
 **Examples**
 
 Here are some screenshots:
-|---|---|---|
-|![Line](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/line.png)|![Function](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/function.png)|![Points](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/points.png)|
-|![Polar](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/polar.png)|![Bars](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/bars.png)|![Histogram](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/histogram.png)|
-|![Semi-Log](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/semi-log.png)|![Export](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/export.png)|![Realtime](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/realtime.png)|
+|![Line](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/line.png|width=100px)|![Function](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/function.png|width=100px)|![Points](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/points.png|width=100px)|
+|![Polar](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/polar.png|width=100px)|![Bars](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/bars.png)|width=100px|![Histogram](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/histogram.png|width=100px)|
+|![Semi-Log](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/semi-log.png|width=100px)|![Export](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/export.png|width=100px)|![Realtime](https://github.com/dhuertas/graph.js/blob/master/htmldocs/img/realtime.png|width=100px)|
 
 Where to start? Browse some examples to see how it works:
 - [Line](https://github.com/dhuertas/graph.js/blob/master/examples/line.html)
